@@ -1,3 +1,4 @@
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -5,10 +6,12 @@ public class Time {
 	Date sysClock = new Date();
 	long startTime;
 	long endTime;
+	long currentTime;
 	
 	public Time() {
 		startTime = 0;
 		endTime = 0;
+		currentTime = 0;
 	}
 	
 	private long[] parseTime(String timeIn) {
@@ -17,7 +20,7 @@ public class Time {
 		String[] hms = timeIn.split(":");
 		times[0] = Long.parseLong(hms[0]);		// Hours
 		times[1] = Long.parseLong(hms[1]);		// Minutes
-		String[] sms = hms[1].split(".");
+		String[] sms = hms[2].split("\\.");
 		times[2] = Long.parseLong(sms[0]);		// Seconds
 		times[3] = Long.parseLong(sms[1]);		// Milliseconds
 		
@@ -32,11 +35,12 @@ public class Time {
 	}
 	
 	private String toHMSString(long time) {
-		return String.format("%01d:%02d:%02d.%01d",						// [Format] h:mm:ss:m
-							 TimeUnit.MILLISECONDS.toHours(time),
-						     TimeUnit.MILLISECONDS.toMinutes(time),
-						     TimeUnit.MILLISECONDS.toSeconds(time),
-						     TimeUnit.MILLISECONDS.toMillis(time));
+		long hours = time / 1000 / 60 / 60;
+		long minutes = (time / 1000 / 60) - (hours * 60);
+		long seconds = (time / 1000) - (hours * 60 * 60) - (minutes * 60);
+		long mSeconds = time - (hours * 60 * 60 * 1000) - (minutes * 60 * 1000) - (seconds * 1000);
+		
+		return hours + ":" + minutes + ":" + seconds + "." + mSeconds;
 	}
 	
 	public void start() {
@@ -58,6 +62,23 @@ public class Time {
 	}
 	
 	public String getTime() {
-		return toHMSString(sysClock.getTime());
+		return LocalTime.now().toString().substring(0,10);
+	}
+	
+	public void setTime(String timeIn) {
+		long[] times = parseTime(timeIn);
+		currentTime = toMills(times);
+	}
+	
+	public String getStart() {
+		return toHMSString(this.startTime);
+	}
+	
+	public String getFinish() {
+		return toHMSString(this.endTime);
+	}
+	
+	public String totalTime() {
+		return toHMSString(this.endTime - this.startTime);
 	}
 }
