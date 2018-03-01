@@ -1,0 +1,10 @@
+
+import java.util.*;
+import java.text.*;
+
+
+Date t = new Date(time);
+
+		SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss.S");
+		
+		System.out.println(ft.format(t));
