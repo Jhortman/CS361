@@ -22,7 +22,7 @@ public class DirectoryProxy
 			{
 				switch(cmd.toUpperCase())
 				{
-					case "ADD": 	System.out.println("Enter Employee(s) [FirstName LastName Phone Department] :");
+					case "ADD": 	System.out.println("Enter Employee(s) [FirstName LastName Department Phone] :");
 									do{
 										employee = sc.nextLine();
 										add(employee);
