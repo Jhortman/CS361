@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class DirectoryProxy 
-{
+public class DirectoryProxy {
+
 	public ArrayList<Employee> empList = new ArrayList<Employee>();
 	
 	public static void main(String[] args)
@@ -12,38 +12,50 @@ public class DirectoryProxy
 		String employee;
 		boolean flag = false;
 		
-		
-		
-		do
-		{
+		do {
 			System.out.print("Enter Command: ");
 			cmd = sc.next();
-			do
-			{
-				switch(cmd.toUpperCase())
-				{
+			do {
+				switch(cmd.toUpperCase()) {
 					case "ADD": 	System.out.println("Enter Employee(s) [FirstName LastName Department Phone] :");
-									do{
+									do {
 										employee = sc.nextLine();
-										add(employee);
-									}while(!employee.equalsIgnoreCase("END"));
+										add(employee); // static?
+									} while(!employee.equalsIgnoreCase("END"));
 									flag = true;
 									break;
-								
-					case "CLR":		clear();
+					case "CLR":		clear(); // static?
 									flag = true;
 									break;
-					case "PRINT":	print();
+					case "PRINT":	print(); // static?
 									flag = true;
 									break;
-					default: 	
-									System.out.println("Invalid Command");
+					default: 		System.out.println("Invalid Command");
 									System.out.println("Enter Command: ");
 									break;
 				}
-			}while (!flag);
+			} while (!flag);
 		
-		}while (!cmd.equalsIgnoreCase("quit"));
+		} while (!cmd.equalsIgnoreCase("quit"));
 		
 		
 	}
+	private void add(String s) {
+		String[] strArr = s.split(" ");
+		Employee e = new Employee(strArr[1], strArr[0], strArr[3], strArr[2]);
+		empList.add(e);
+		empList.sort(c); // comparator research
+	}
+	private void clear() {
+		empList = new ArrayList<Employee>();
+	}
+	private void print() {
+		if (empList.size() == 0) {
+			System.out.println("<empty directory>");
+			return;
+		}
+		for (Employee e : empList) {
+			System.out.println(e.toString());
+		}
+	}
+}
