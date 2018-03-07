@@ -1,0 +1,49 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class DirectoryProxy 
+{
+	public ArrayList<Employee> empList = new ArrayList<Employee>();
+	
+	public static void main(String[] args)
+	{
+		Scanner sc = new Scanner (System.in);
+		String cmd;
+		String employee;
+		boolean flag = false;
+		
+		
+		
+		do
+		{
+			System.out.print("Enter Command: ");
+			cmd = sc.next();
+			do
+			{
+				switch(cmd.toUpperCase())
+				{
+					case "ADD": 	System.out.println("Enter Employee(s) [FirstName LastName Phone Department] :");
+									do{
+										employee = sc.nextLine();
+										add(employee);
+									}while(!employee.equalsIgnoreCase("END"));
+									flag = true;
+									break;
+								
+					case "CLR":		clear();
+									flag = true;
+									break;
+					case "PRINT":	print();
+									flag = true;
+									break;
+					default: 	
+									System.out.println("Invalid Command");
+									System.out.println("Enter Command: ");
+									break;
+				}
+			}while (!flag);
+		
+		}while (!cmd.equalsIgnoreCase("quit"));
+		
+		
+	}
