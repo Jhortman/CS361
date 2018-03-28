@@ -1,12 +1,29 @@
 import javax.swing.*;
+
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Scanner;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 public class ClientGUI extends JFrame {
 	
 	private String test;
+	private String _gender;
+	private String _title;
 	private JTextField _firstName;
 	private JTextField _lastName;
 	private JTextField _department;
@@ -14,24 +31,34 @@ public class ClientGUI extends JFrame {
 	private JRadioButton _male;
 	private JRadioButton _female;
 	private JRadioButton _other;
+	private ButtonGroup _group;
 	private JList _list;
     private DefaultListModel<String> _listModel;
 	private JButton _submit = new JButton("Submit");
 	private JButton _exit = new JButton("Exit");
-	Directory dir = new Directory();
+	private JButton _print = new JButton("Print");
+	private JButton _clear = new JButton("Clear");
+	private static DirectoryProxy proxy = new DirectoryProxy();
 	
+	
+	public static void main(String[] args){
+
+		new ClientGUI();
+	
+	}
 	
 	public ClientGUI(){
+		
 		setTitle("Client");
         setSize(500,200);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
 		
         
         createDisplay();
         
 		setResizable(true);
         setLocationRelativeTo(null);
-        setVisible(true);
+        setVisible(false);
 	}
 	@SuppressWarnings("unchecked")
 	public void createDisplay(){
@@ -49,14 +76,14 @@ public class ClientGUI extends JFrame {
 		_female = new JRadioButton();
 		_other = new JRadioButton();
 		
-		ButtonGroup group = new ButtonGroup();
-		group.add(_male);
-		group.add(_female);
-		group.add(_other);
+		_group = new ButtonGroup();
+		_group.add(_male);
+		_group.add(_female);
+		_group.add(_other);
 		
 		JPanel submitExitPanel = new JPanel(new GridLayout(1,2));
 		JPanel entryPanel = new JPanel(new GridLayout(4,2));
-		JPanel typePanel = new JPanel(new GridLayout(4,2));
+		JPanel typePanel = new JPanel(new GridLayout(5,2));
 		JPanel type2Panel = new JPanel(new BorderLayout());
 		
 		_firstName = new JTextField(20);
@@ -90,8 +117,12 @@ public class ClientGUI extends JFrame {
 		typePanel.add(genderOth);
 		typePanel.add(_other);
 		
+		typePanel.add(_print);
+		typePanel.add(_clear);
+		
 		//List Title (Mr./Ms./Mrs./Dr./Col./Prof.) Selection number: 1
 		_listModel= new DefaultListModel<String>();
+		_listModel.addElement("Mr.");
 		_listModel.addElement("Ms.");
 		_listModel.addElement("Mrs.");
 		_listModel.addElement("Dr.");
@@ -114,7 +145,8 @@ public class ClientGUI extends JFrame {
 		
 		_submit.addActionListener(new ClickListener());
 		_exit.addActionListener(new ClickListener());
-		
+		_print.addActionListener(new ClickListener());
+		_clear.addActionListener(new ClickListener());
 
 	}
 	
@@ -125,27 +157,60 @@ public class ClientGUI extends JFrame {
 		{
 			if(event.getSource().equals(_submit))
 			{
-				Employee newEmp = new Employee(_lastName.getText(),_firstName.getText(),_phone.getText(),_department.getText());
-				dir.add(newEmp);
+				
+				// Find gender
+				if(_male.isSelected()) {
+					_gender = "Male";
+				}
+				else if(_female.isSelected()) {
+					_gender = "Female";
+				}
+				else if(_other.isSelected()){
+					_gender = "Other";
+				}
+				else {
+					_gender = "Male"; 	// default gender will be male if nothing is selected
+				}
+				
+				_title = _listModel.getElementAt(_list.getSelectedIndex());
+				
+				Employee newEmp = new Employee(_lastName.getText(),_firstName.getText(),_phone.getText(),_department.getText(),_gender,_title);
+				proxy.add(newEmp);
 				_lastName.setText("");
 				_firstName.setText("");
 				_phone.setText("");
 				_department.setText("");
+				_group.clearSelection();
+				_list.clearSelection();
+				
 				System.out.println("Employee Added");
+				String out = "";
+				out += "ADD ";
+				
+				Gson g = new Gson();
+				out += g.toJson(proxy.getDir());
+				
+				proxy.sendPost(out);
+				proxy.clear();
+				System.out.println(out);
+			}
+			
+			if(event.getSource().equals(_print)){
+				proxy.sendPost("PRINT ");
+			}
+			if(event.getSource().equals(_clear)){
+				proxy.sendPost("CLEAR ");
 			}
 			if(event.getSource().equals(_exit))
 			{
 				System.exit(0);
 			}
-			
+				
 		}
 	
 	}
-	public static void main(String[] args){
+	
+	
+	
 		
-		new ClientGUI();
-		
-		
-	}
-
 }
