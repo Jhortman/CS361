@@ -1,0 +1,64 @@
+HTML:
+
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+
+  <h2> Company Directory</h2>
+
+<table>
+  <caption></caption>
+  <tr>
+    <th>Title</th>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Department</th>
+    <th>Phone</th>
+    <th>Gender</th>
+  </tr>
+    <tr>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+ 
+    <tr>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+  
+  
+</table>
+
+</body>
+</html>
+
+
+CSS:
+
+h2 {
+    text-align:center;}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;}
+th, td {
+    padding: 10px;
+    text-align: Left;}
+table { 
+    width: 100%;}
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
