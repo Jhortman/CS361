@@ -1,0 +1,19 @@
+System.out.println(_curRun.getCurEvent());
+			if(_curRun.getCurEvent().toUpperCase().equals("GRPEVENT")){
+				System.out.println("here");
+				for(int j = 0; j < _curRun.getRacers().size(); j++){
+					System.out.println("here");
+					_curRacer = _curRun.popRacer(); //pop racer from start queue 
+					_curRacer.start();
+					_racers.add(_curRacer); // add racer to racers: currently racing queue
+					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+				}
+				
+			}
+			else{
+			_curRacer = _curRun.popRacer(); //pop racer from start queue 
+			_curRacer.start();
+			_racers.add(_curRacer); // add racer to racers: currently racing queue
+			System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+			}
+			
