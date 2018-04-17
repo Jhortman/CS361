@@ -39,9 +39,10 @@ public class ChronotimerGUI extends JFrame {
 	private JButton _printerPower = new JButton("PRINTER POWER");	
 	private JButton _swap = new JButton("SWAP");
 	
+	private Chronotimer _c = new Chronotimer();
+	
 	public static void main(String[] args){
 		new ChronotimerGUI();
-		new Chronotimer();
 	}
 	
 	public ChronotimerGUI(){		
@@ -131,12 +132,15 @@ public class ChronotimerGUI extends JFrame {
 		add(south, BorderLayout.CENTER);
 		
 		// Add action listeners
-/*
+		_power.addActionListener(new ClickListener());
  		_b1.addActionListener(new ClickListener());
 		_b2.addActionListener(new ClickListener());
 		_b3.addActionListener(new ClickListener());
 		_b4.addActionListener(new ClickListener());
-*/
+		_b5.addActionListener(new ClickListener());
+		_b6.addActionListener(new ClickListener());
+		_b7.addActionListener(new ClickListener());
+		_b8.addActionListener(new ClickListener());
 	}
 	
 	class ClickListener implements ActionListener
@@ -144,11 +148,30 @@ public class ChronotimerGUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent event) 
 		{
-		/*
-		 	if(event.getSource().equals(_power)) {
-			
-			}
-		 */			
+			// POWER
+		 	if(event.getSource().equals(_power)) _c.COMMANDS("POWER");
+		 	
+		 	// START
+		 	else if(event.getSource().equals(_b1)) _c.COMMANDS("TRIG 1");
+		 	else if(event.getSource().equals(_b3)) _c.COMMANDS("TRIG 3");
+		 	else if(event.getSource().equals(_b5)) _c.COMMANDS("TRIG 5");
+		 	else if(event.getSource().equals(_b7)) _c.COMMANDS("TRIG 7");
+		 	
+		 	// FINISH
+		 	else if(event.getSource().equals(_b2)) _c.COMMANDS("TRIG 2");
+		 	else if(event.getSource().equals(_b4)) _c.COMMANDS("TRIG 4");
+		 	else if(event.getSource().equals(_b6)) _c.COMMANDS("TRIG 6");
+		 	else if(event.getSource().equals(_b8)) _c.COMMANDS("TRIG 8");
+		 	
+		 	// ENABLE
+		 	else if(event.getSource().equals(_b1)) _c.COMMANDS("TOG 1");
+		 	else if(event.getSource().equals(_b2)) _c.COMMANDS("TOG 2");
+		 	else if(event.getSource().equals(_b3)) _c.COMMANDS("TOG 3");
+		 	else if(event.getSource().equals(_b4)) _c.COMMANDS("TOG 4");
+		 	else if(event.getSource().equals(_b5)) _c.COMMANDS("TOG 5");
+		 	else if(event.getSource().equals(_b6)) _c.COMMANDS("TOG 6");
+		 	else if(event.getSource().equals(_b7)) _c.COMMANDS("TOG 7");
+		 	else if(event.getSource().equals(_b8)) _c.COMMANDS("TOG 8");
 		}
 	}		
 }
