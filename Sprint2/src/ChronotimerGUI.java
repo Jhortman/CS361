@@ -15,7 +15,7 @@ public class ChronotimerGUI extends JFrame {
 	private JRadioButton _ch6 = new JRadioButton();
 	private JRadioButton _ch7 = new JRadioButton();
 	private JRadioButton _ch8 = new JRadioButton();
-	private JButton _b1 = new JButton("");
+	private JButton _b1 = new JButton("");		// Start/finish buttons
 	private JButton _b2 = new JButton("");
 	private JButton _b3 = new JButton("");
 	private JButton _b4 = new JButton("");
@@ -94,6 +94,7 @@ public class ChronotimerGUI extends JFrame {
 		// Northeast - printer panel + printer text field
 		JPanel printerPanel = new JPanel(new GridLayout(2, 1));
 		JTextArea printerField = new JTextArea(5, 20);
+		printerField.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 		printerField.setEditable(false);
 		
 		printerPanel.add(_printerPower, BorderLayout.NORTH);
@@ -115,13 +116,24 @@ public class ChronotimerGUI extends JFrame {
 		// South-center - text field for racing times
 		JPanel raceTimesPanel = new JPanel(new GridLayout(2, 1));
 		JTextArea raceTimesField = new JTextArea(10, 20);
+		raceTimesField.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 		raceTimesField.setEditable(false);
 		
 		raceTimesPanel.add(raceTimesField, BorderLayout.CENTER);
 		raceTimesPanel.add(timerLabel, BorderLayout.SOUTH);
 		
 		// Southwest - swap button
-		south.add(_swap, BorderLayout.WEST);
+		JPanel swapPanel = new JPanel(new GridLayout(3,1));
+		JTextArea tf1 = new JTextArea(10, 20);
+		tf1.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+		tf1.setEditable(false);
+		JTextArea tf2 = new JTextArea(10, 20);
+		tf2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+		tf2.setEditable(false);
+		swapPanel.add(_swap, BorderLayout.NORTH);
+		swapPanel.add(tf1, BorderLayout.CENTER);
+		swapPanel.add(tf2, BorderLayout.SOUTH);
+		south.add(swapPanel, BorderLayout.WEST);
 		
 		south.add(raceTimesPanel, BorderLayout.CENTER);
 		south.add(keypadPanel, BorderLayout.EAST);
