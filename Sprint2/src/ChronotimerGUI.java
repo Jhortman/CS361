@@ -38,7 +38,7 @@ public class ChronotimerGUI extends JFrame {
 	private JButton _power = new JButton("POWER");
 	private JButton _printerPower = new JButton("PRINTER POWER");	
 	private JButton _swap = new JButton("SWAP");
-	private JTextArea printerField = new JTextArea(5, 20);
+	private JTextArea printerTextArea = new JTextArea(5, 20);
 	
 	private Chronotimer _c = new Chronotimer();
 	
@@ -97,7 +97,6 @@ public class ChronotimerGUI extends JFrame {
 		
 		JPanel printerField = new JPanel();
 		printerField.setLayout(new BoxLayout(printerField, BoxLayout.X_AXIS));
-		JTextArea printerTextArea = new JTextArea(5, 20);
 		printerTextArea.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 		printerTextArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(printerTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,  JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -221,24 +220,24 @@ public class ChronotimerGUI extends JFrame {
 		public void actionPerformed(ActionEvent event) 
 		{
 			
-			if(event.getSource().equals(_kp1)) printerField.append("1");
-			if(event.getSource().equals(_kp2)) printerField.append("2");
-			if(event.getSource().equals(_kp3)) printerField.append("3");
-			if(event.getSource().equals(_kp4)) printerField.append("4");
-			if(event.getSource().equals(_kp5)) printerField.append("5");
-			if(event.getSource().equals(_kp6)) printerField.append("6");
-			if(event.getSource().equals(_kp7)) printerField.append("7");
-			if(event.getSource().equals(_kp8)) printerField.append("8");
-			if(event.getSource().equals(_kp9)) printerField.append("9");
-			if(event.getSource().equals(_kpS)) printerField.append("*");
-			if(event.getSource().equals(_kp0)) printerField.append("0");
+			if(event.getSource().equals(_kp1)) printerTextArea.append("1");
+			if(event.getSource().equals(_kp2)) printerTextArea.append("2");
+			if(event.getSource().equals(_kp3)) printerTextArea.append("3");
+			if(event.getSource().equals(_kp4)) printerTextArea.append("4");
+			if(event.getSource().equals(_kp5)) printerTextArea.append("5");
+			if(event.getSource().equals(_kp6)) printerTextArea.append("6");
+			if(event.getSource().equals(_kp7)) printerTextArea.append("7");
+			if(event.getSource().equals(_kp8)) printerTextArea.append("8");
+			if(event.getSource().equals(_kp9)) printerTextArea.append("9");
+			if(event.getSource().equals(_kpS)) printerTextArea.append("*");
+			if(event.getSource().equals(_kp0)) printerTextArea.append("0");
 			
 			
 			
 			if(event.getSource().equals(_kpP)) {
 				//create racer object and then add it to queue then clear text area
 				//check for numbers out of range [0,9999]
-				printerField.setText("");
+				printerTextArea.setText("");
 			}
 			
 			
