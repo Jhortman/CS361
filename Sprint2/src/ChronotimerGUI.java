@@ -38,6 +38,7 @@ public class ChronotimerGUI extends JFrame {
 	private JButton _power = new JButton("POWER");
 	private JButton _printerPower = new JButton("PRINTER POWER");	
 	private JButton _swap = new JButton("SWAP");
+	private JTextArea printerField = new JTextArea(5, 20);
 	
 	private Chronotimer _c = new Chronotimer();
 	
@@ -93,7 +94,7 @@ public class ChronotimerGUI extends JFrame {
 		
 		// Northeast - printer panel + printer text field
 		JPanel printerPanel = new JPanel(new GridLayout(2, 1));
-		JTextArea printerField = new JTextArea(5, 20);
+		//JTextArea printerField = new JTextArea(5, 20);
 		printerField.setEditable(false);
 		
 		printerPanel.add(_printerPower, BorderLayout.NORTH);
@@ -142,6 +143,7 @@ public class ChronotimerGUI extends JFrame {
 		_b7.addActionListener(new ClickListener());
 		_b8.addActionListener(new ClickListener());
 		
+		// Add action Listeners for channel radio buttons 
 		_ch1.addActionListener(new ClickListener());
 		_ch2.addActionListener(new ClickListener());
 		_ch3.addActionListener(new ClickListener());
@@ -150,6 +152,22 @@ public class ChronotimerGUI extends JFrame {
 		_ch6.addActionListener(new ClickListener());
 		_ch7.addActionListener(new ClickListener());
 		_ch8.addActionListener(new ClickListener());
+		
+		//Add action listener for numpad buttons
+		_kp1.addActionListener(new numListener());
+		_kp2.addActionListener(new numListener());
+		_kp3.addActionListener(new numListener());
+		_kp4.addActionListener(new numListener());
+		_kp5.addActionListener(new numListener());
+		_kp6.addActionListener(new numListener());
+		_kp7.addActionListener(new numListener());
+		_kp8.addActionListener(new numListener());
+		_kp9.addActionListener(new numListener());
+		_kpS.addActionListener(new numListener());
+		_kp0.addActionListener(new numListener());
+		_kpP.addActionListener(new numListener());
+		
+		_swap.addActionListener(new ClickListener());
 		
 	}
 	
@@ -182,6 +200,42 @@ public class ChronotimerGUI extends JFrame {
 		 	else if(event.getSource().equals(_ch6)) _c.COMMANDS("TOG 6");
 		 	else if(event.getSource().equals(_ch7)) _c.COMMANDS("TOG 7");
 		 	else if(event.getSource().equals(_ch8)) _c.COMMANDS("TOG 8");
+		 	
+		 	//Swap - TODO
+		 	
+		 	if(event.getSource().equals(_swap)) _c.COMMANDS("SWAP");
+		 	
+		}
+	}	
+	
+	class numListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent event) 
+		{
+			
+			if(event.getSource().equals(_kp1)) printerField.append("1");
+			if(event.getSource().equals(_kp2)) printerField.append("2");
+			if(event.getSource().equals(_kp3)) printerField.append("3");
+			if(event.getSource().equals(_kp4)) printerField.append("4");
+			if(event.getSource().equals(_kp5)) printerField.append("5");
+			if(event.getSource().equals(_kp6)) printerField.append("6");
+			if(event.getSource().equals(_kp7)) printerField.append("7");
+			if(event.getSource().equals(_kp8)) printerField.append("8");
+			if(event.getSource().equals(_kp9)) printerField.append("9");
+			if(event.getSource().equals(_kpS)) printerField.append("*");
+			if(event.getSource().equals(_kp0)) printerField.append("0");
+			
+			
+			
+			if(event.getSource().equals(_kpP)) {
+				//create racer object and then add it to queue then clear text area
+				//check for numbers out of range [0,9999]
+				printerField.setText("");
+			}
+			
+			
+			//TODO
 		}
 	}		
 }
