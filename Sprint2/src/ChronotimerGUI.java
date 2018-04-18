@@ -15,7 +15,7 @@ public class ChronotimerGUI extends JFrame {
 	private JRadioButton _ch6 = new JRadioButton();
 	private JRadioButton _ch7 = new JRadioButton();
 	private JRadioButton _ch8 = new JRadioButton();
-	private JButton _b1 = new JButton("");		// Start/finish buttons
+	private JButton _b1 = new JButton("");
 	private JButton _b2 = new JButton("");
 	private JButton _b3 = new JButton("");
 	private JButton _b4 = new JButton("");
@@ -94,7 +94,6 @@ public class ChronotimerGUI extends JFrame {
 		// Northeast - printer panel + printer text field
 		JPanel printerPanel = new JPanel(new GridLayout(2, 1));
 		JTextArea printerField = new JTextArea(5, 20);
-		printerField.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 		printerField.setEditable(false);
 		
 		printerPanel.add(_printerPower, BorderLayout.NORTH);
@@ -116,24 +115,13 @@ public class ChronotimerGUI extends JFrame {
 		// South-center - text field for racing times
 		JPanel raceTimesPanel = new JPanel(new GridLayout(2, 1));
 		JTextArea raceTimesField = new JTextArea(10, 20);
-		raceTimesField.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 		raceTimesField.setEditable(false);
 		
 		raceTimesPanel.add(raceTimesField, BorderLayout.CENTER);
 		raceTimesPanel.add(timerLabel, BorderLayout.SOUTH);
 		
 		// Southwest - swap button
-		JPanel swapPanel = new JPanel(new GridLayout(3,1));
-		JTextArea tf1 = new JTextArea(10, 20);
-		tf1.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-		tf1.setEditable(false);
-		JTextArea tf2 = new JTextArea(10, 20);
-		tf2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-		tf2.setEditable(false);
-		swapPanel.add(_swap, BorderLayout.NORTH);
-		swapPanel.add(tf1, BorderLayout.CENTER);
-		swapPanel.add(tf2, BorderLayout.SOUTH);
-		south.add(swapPanel, BorderLayout.WEST);
+		south.add(_swap, BorderLayout.WEST);
 		
 		south.add(raceTimesPanel, BorderLayout.CENTER);
 		south.add(keypadPanel, BorderLayout.EAST);
@@ -153,6 +141,16 @@ public class ChronotimerGUI extends JFrame {
 		_b6.addActionListener(new ClickListener());
 		_b7.addActionListener(new ClickListener());
 		_b8.addActionListener(new ClickListener());
+		
+		_ch1.addActionListener(new ClickListener());
+		_ch2.addActionListener(new ClickListener());
+		_ch3.addActionListener(new ClickListener());
+		_ch4.addActionListener(new ClickListener());
+		_ch5.addActionListener(new ClickListener());
+		_ch6.addActionListener(new ClickListener());
+		_ch7.addActionListener(new ClickListener());
+		_ch8.addActionListener(new ClickListener());
+		
 	}
 	
 	class ClickListener implements ActionListener
@@ -175,15 +173,15 @@ public class ChronotimerGUI extends JFrame {
 		 	else if(event.getSource().equals(_b6)) _c.COMMANDS("TRIG 6");
 		 	else if(event.getSource().equals(_b8)) _c.COMMANDS("TRIG 8");
 		 	
-		 	// ENABLE
-		 	else if(event.getSource().equals(_b1)) _c.COMMANDS("TOG 1");
-		 	else if(event.getSource().equals(_b2)) _c.COMMANDS("TOG 2");
-		 	else if(event.getSource().equals(_b3)) _c.COMMANDS("TOG 3");
-		 	else if(event.getSource().equals(_b4)) _c.COMMANDS("TOG 4");
-		 	else if(event.getSource().equals(_b5)) _c.COMMANDS("TOG 5");
-		 	else if(event.getSource().equals(_b6)) _c.COMMANDS("TOG 6");
-		 	else if(event.getSource().equals(_b7)) _c.COMMANDS("TOG 7");
-		 	else if(event.getSource().equals(_b8)) _c.COMMANDS("TOG 8");
+		 	// ENABLE | Disable
+		 	else if(event.getSource().equals(_ch1))	_c.COMMANDS("TOG 1");
+		 	else if(event.getSource().equals(_ch2)) _c.COMMANDS("TOG 2");
+		 	else if(event.getSource().equals(_ch3)) _c.COMMANDS("TOG 3");
+		 	else if(event.getSource().equals(_ch4)) _c.COMMANDS("TOG 4");
+		 	else if(event.getSource().equals(_ch5)) _c.COMMANDS("TOG 5");
+		 	else if(event.getSource().equals(_ch6)) _c.COMMANDS("TOG 6");
+		 	else if(event.getSource().equals(_ch7)) _c.COMMANDS("TOG 7");
+		 	else if(event.getSource().equals(_ch8)) _c.COMMANDS("TOG 8");
 		}
 	}		
 }
