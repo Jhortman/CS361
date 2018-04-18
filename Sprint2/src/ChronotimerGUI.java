@@ -94,8 +94,15 @@ public class ChronotimerGUI extends JFrame {
 		
 		// Northeast - printer panel + printer text field
 		JPanel printerPanel = new JPanel(new GridLayout(2, 1));
-		//JTextArea printerField = new JTextArea(5, 20);
-		printerField.setEditable(false);
+		
+		JPanel printerField = new JPanel();
+		printerField.setLayout(new BoxLayout(printerField, BoxLayout.X_AXIS));
+		JTextArea printerTextArea = new JTextArea(5, 20);
+		printerTextArea.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
+		printerTextArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(printerTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,  JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		printerField.add(scrollPane);
 		
 		printerPanel.add(_printerPower, BorderLayout.NORTH);
 		printerPanel.add(printerField, BorderLayout.CENTER);
