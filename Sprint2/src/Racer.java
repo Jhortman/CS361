@@ -18,7 +18,19 @@ public class Racer{
 	public String getName() {
 		return name;
 	}
+	public long getFinishAsLong() {
+		return finish;
+	}
+	public long getStartAsLong() {
+		return start;
+	}
 	
+	public void setFinish(long fin) {
+		finish = fin;
+	}
+	public void setRaceTime(String time) {
+		raceTime = time;
+	}
 	//might use later
 	public String getStart() {
 		return Time.toHMSString(start);
@@ -32,18 +44,7 @@ public class Racer{
 		return raceTime;
 	}
 	
-	//swap out passed in racer finish times with current racer finish time. 
-	// might modify method later to handle two passed in racers. 
-	public void swapFinish(Racer racerOne, Racer racerTwo) {
-		long temp = racerOne.finish;
-		
-		racerOne.finish = racerTwo.finish;
-		racerTwo.finish = temp;
-		
-		racerTwo.raceTime = Time.toHMSString(racerTwo.finish - racerTwo.start);
-		racerOne.raceTime = Time.toHMSString(racerOne.finish - racerOne.start);
-		
-	}
+	
 	// make static call to time class to access method that gets the right system time to assign
 	public void start() {
 		start = Time.getTime();

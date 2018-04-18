@@ -56,6 +56,7 @@ public class Chronotimer {
 			case "ENDRUN"	: endRun();   break;
 			case "PRINT"	: Print() ;   break;
 			case "EXPORT"	: Export(Integer.parseInt(tokens[1])); break;
+			case "SWAP"		: swap(); 	  break;
 			
 			default: System.out.println("bad input"); break;
 			 
@@ -232,6 +233,14 @@ public class Chronotimer {
 			}
 		}
 			
+	}
+	
+	private void swap() {
+		if(_racers.size() >= 2 && _event.equals("IND")) {
+			
+			//next two to finish for IND 
+			_curRun.swapFinish(_racers.get(0), _racers.get(1));
+		}
 	}
 	
 //	private void CONN(String s, int i) {
