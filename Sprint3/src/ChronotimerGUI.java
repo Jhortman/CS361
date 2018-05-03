@@ -1,8 +1,12 @@
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 public class ChronotimerGUI extends JFrame {
 	
@@ -35,18 +39,49 @@ public class ChronotimerGUI extends JFrame {
 	private JButton _kp0 = new JButton("0");
 	private JButton _kpS = new JButton("*");
 	private JButton _kpP = new JButton("#");
+	//Jmenu items for function
+	private JMenuItem _newRun = new JMenuItem("NEWRUN");
+	private JMenuItem _endRun = new JMenuItem("ENDRUN");
+	private JMenuItem _DNF = new JMenuItem("DNF");
+	private JMenuItem _cancel = new JMenuItem("CANCEL");
+	private JMenuItem _num = new JMenuItem("NUM");
+	private JMenuItem _time = new JMenuItem("TIME");
+	private JMenuItem _reset = new JMenuItem("RESET");
+	private JMenuItem _export = new JMenuItem("EXPORT");
+	private JMenu _eventMenu = new JMenu("EVENT");				//need submenu for events
+	
+	//submenu items for events
+	private JMenuItem _eventIND = new JMenuItem("IND");
+	private JMenuItem _eventPARIND = new JMenuItem("PARIND");
+	private JMenuItem _eventGRP = new JMenuItem("GRP");
+	private JMenuItem _eventPARGRP = new JMenuItem("PARGRP");
+	
+	
+	
+	
+	
+	
 	private JButton _power = new JButton("POWER");
 	private JButton _printerPower = new JButton("PRINTER POWER");	
 	private JButton _swap = new JButton("SWAP");
+	private JMenuBar _functionBar = new JMenuBar();
+	private JMenu	_functionMenu	= new JMenu("FUNCTION");
 	private static JTextArea printerTextArea = new JTextArea(5, 20);
 	
+	//pass in printerfield to chronotimer for printing events 
 	private static Chronotimer _c = new Chronotimer(printerTextArea);
 	
-	public static void main(String[] args){
-		new ChronotimerGUI();
-		Simulator simulate = new Simulator();
-		simulate.simulate(_c);
-		
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					new ChronotimerGUI();
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	public ChronotimerGUI(){		
@@ -67,13 +102,13 @@ public class ChronotimerGUI extends JFrame {
 		JPanel south = new JPanel(new GridLayout(1, 3));
 
 		// Initializing labels
-		JLabel start, finish, activated, activated2, function, timerLabel, dummy, dummy2,
+		JLabel start, finish, activated, activated2, timerLabel, dummy, dummy2,
 		num1, num2, num3, num4, num5, num6, num7, num8;
 		start = new JLabel("Start");
 		finish = new JLabel("Finish");
 		activated = new JLabel("Enable/Disable");
 		activated2 = new JLabel("Enable/Disable");
-		function = new JLabel("FUNCTION");
+
 		timerLabel = new JLabel("Queue / Running / Final Time");
 		dummy = new JLabel("");
 		dummy2 = new JLabel("");
@@ -109,11 +144,12 @@ public class ChronotimerGUI extends JFrame {
 		printerPanel.add(_printerPower, BorderLayout.NORTH);
 		printerPanel.add(printerField, BorderLayout.CENTER);
 		
-		// Northwest - power button
+		// Northwest - power button , function
 		north.add(_power, BorderLayout.WEST);
 		
 		north.add(channelsPanel, BorderLayout.CENTER);
 		north.add(printerPanel, BorderLayout.EAST);
+		
 		
 		// Southeast - keypad
 		JPanel keypadPanel = new JPanel(new GridLayout(4,3));
@@ -130,18 +166,44 @@ public class ChronotimerGUI extends JFrame {
 		raceTimesPanel.add(raceTimesField, BorderLayout.CENTER);
 		raceTimesPanel.add(timerLabel, BorderLayout.SOUTH);
 		
+
+		
+		//add menuitems to function menu
+		_functionMenu.add(_newRun);
+		_functionMenu.add(_endRun);
+		_functionMenu.add(_eventMenu);
+		_functionMenu.add(_num);
+		_functionMenu.add(_time);
+		_functionMenu.add(_endRun);
+		_functionMenu.add(_DNF);
+		_functionMenu.add(_cancel);
+		_functionMenu.add(_reset);
+		_functionMenu.add(_export);
+		
+		//add submenu items to event menu
+		_eventMenu.add(_eventIND);
+		_eventMenu.add(_eventPARIND);
+		_eventMenu.add(_eventGRP);
+		_eventMenu.add(_eventPARGRP);
+		
+		//want to fiddle around with positioning of menu bar in future
+		_functionBar.add(_functionMenu);
+		
 		// Southwest - swap button
-		JPanel swapPanel = new JPanel(new GridLayout(3,1));
+		JPanel functionPanel = new JPanel(new GridLayout(3,1));
 		JTextArea tf1 = new JTextArea(10, 20);
 		tf1.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 		tf1.setEditable(false);
 		JTextArea tf2 = new JTextArea(10, 20);
 		tf2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 		tf2.setEditable(false);
-		swapPanel.add(_swap, BorderLayout.NORTH);
-		swapPanel.add(tf1, BorderLayout.CENTER);
-		swapPanel.add(tf2, BorderLayout.SOUTH);
-		south.add(swapPanel, BorderLayout.WEST);
+		functionPanel.add(_functionBar, BorderLayout.NORTH);
+		functionPanel.add(_swap, BorderLayout.CENTER);
+		functionPanel.add(tf2, BorderLayout.SOUTH);
+	
+		
+		
+		south.add(functionPanel, BorderLayout.WEST);
 		
 		south.add(raceTimesPanel, BorderLayout.CENTER);
 		south.add(keypadPanel, BorderLayout.EAST);
@@ -185,6 +247,22 @@ public class ChronotimerGUI extends JFrame {
 		_kpS.addActionListener(new numListener());
 		_kp0.addActionListener(new numListener());
 		_kpP.addActionListener(new numListener());
+		
+		
+		//add action listeners for JMenuItems
+		_newRun.addActionListener(new MenuListener());
+		_endRun.addActionListener(new MenuListener());
+		_DNF.addActionListener(new MenuListener());
+		_cancel.addActionListener(new MenuListener());
+		_num.addActionListener(new MenuListener());
+		_export.addActionListener(new MenuListener());
+		_time.addActionListener(new MenuListener());
+		_reset.addActionListener(new MenuListener());
+		
+		_eventIND.addActionListener(new MenuListener());
+		_eventPARIND.addActionListener(new MenuListener());
+		_eventGRP.addActionListener(new MenuListener());
+		_eventPARGRP.addActionListener(new MenuListener());
 		
 		_swap.addActionListener(new ClickListener());
 		
@@ -263,14 +341,85 @@ public class ChronotimerGUI extends JFrame {
 			if(event.getSource().equals(_kpP)) {
 				//create racer object and then add it to queue then clear text area
 				//check for numbers out of range [0,9999]
+				Document document = printerTextArea.getDocument();
+				Element rootElem = document.getDefaultRootElement();
+				int numLines = rootElem.getElementCount();
+				Element lineElem = rootElem.getElement(numLines - 2);
+				int lineStart = lineElem.getStartOffset();
+				int lineEnd = lineElem.getEndOffset();
 				
 				
 				
-				printerTextArea.setText("");
+				try {
+					String lineText = document.getText(lineStart, lineEnd - lineStart);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			
 			
 			//TODO
 		}
-	}		
+		
+	}
+	
+	
+	class MenuListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			
+			if(event.getSource().equals(_newRun)) {
+				_c.COMMANDS("NEWRUN");
+			}
+			if(event.getSource().equals(_endRun)) {
+				_c.COMMANDS("ENDRUN");
+			}
+			if(event.getSource().equals(_num)) {
+				//Solution for grabbing just the last line of our printer text field for parsing bib numbers
+				Document document = printerTextArea.getDocument();
+				Element rootElem = document.getDefaultRootElement();
+				int numLines = rootElem.getElementCount();
+				Element lineElem = rootElem.getElement(numLines - 1);
+				int lineStart = lineElem.getStartOffset();
+				int lineEnd = lineElem.getEndOffset();
+				
+				String lineText = "";
+				
+				try {
+					lineText = document.getText(lineStart, lineEnd - lineStart);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+				lineText = lineText.trim();
+				printerTextArea.append("\n");
+			
+				_c.COMMANDS("NUM " + lineText);
+			}
+			if(event.getSource().equals(_DNF)) {
+				_c.COMMANDS("DNF");
+			}
+			if(event.getSource().equals(_cancel)) {
+				_c.COMMANDS("CANCEL");
+			}
+			if(event.getSource().equals(_reset)) {
+				_c.COMMANDS("RESET");
+			}
+			if(event.getSource().equals(_export)) {
+			//TODO	_c.COMMANDS("EXPORT " + _c.getRun().getRunNum() );
+			}
+			if(event.getSource().equals(_eventIND)) {
+				_c.COMMANDS("EVENT IND");
+			}
+			if(event.getSource().equals(_eventPARIND)) {
+				_c.COMMANDS("EVENT PARIND");
+			}
+			if(event.getSource().equals(_eventGRP)) {
+				_c.COMMANDS("EVENT GRP");
+			}
+			if(event.getSource().equals(_eventPARGRP)) {
+				_c.COMMANDS("EVENT PARGRP");
+			}
+		}
+	}
 }

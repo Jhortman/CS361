@@ -1,4 +1,6 @@
 import java.util.LinkedList;
+
+import javax.swing.JTextArea;
 public class Run {
 	
 	private LinkedList<Racer> _queue;
@@ -25,10 +27,22 @@ public class Run {
 		_queue.addFirst(bibNum);				//used in the event of a cancel 
 	}
 	
-	public void add(String bibNum) {			//add racer to end of queue; if queue is empty -> start
-	 Racer racer = new Racer(bibNum);	
-		_queue.add(racer);
-		System.out.println(Time.toHMSString(Time.getTime()) + " " + bibNum + " has been added to queue");
+	public void add(String bibNum, JTextArea printer) {			//add racer to end of queue; if queue is empty -> start
+		int compare = Integer.parseInt(bibNum);
+		
+		
+		if(compare < 0 || compare > 9999) {
+			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid bib number");
+			printer.append(" Invalid bib number\n");
+		}
+		else {
+			Racer racer = new Racer(bibNum);	
+			_queue.add(racer);
+			System.out.println(Time.toHMSString(Time.getTime()) + " " + bibNum + " has been added to queue");
+			printer.append(bibNum + " has been added to queue\n");
+		}
+		
+		
 	}
 	
 	//removes first racer in queue waiting to start 

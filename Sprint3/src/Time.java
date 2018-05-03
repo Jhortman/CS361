@@ -43,7 +43,7 @@ public class Time {
 		long hSeconds = (time - (hours * 60 * 60 * 1000) - (minutes * 60 * 1000) - (seconds * 1000)) / 10; // divided by 10 because we want hundreths not ms
 		
 		if (hours > 24) {		// testing cases for very long inputs 
-			hours = (hours % 24) + 7; // offset for timezone
+			hours = (hours % 12) + 7; // offset for timezone
 		}
 		
 		if(hours > 12) {

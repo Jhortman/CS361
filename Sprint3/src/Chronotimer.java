@@ -56,14 +56,14 @@ public class Chronotimer {
 			case "EXIT"		: EXIT();break;
 			case "RESET"	: RESET();break;
 			case "TIME"		: TIME(tokens[1]);break;
-			case "EVENT"	: _event = tokens[1]; System.out.println(Time.toHMSString(Time.getTime()) + " " + "event is " + _event ); _printer.append(Time.toHMSString(Time.getTime()) + " " + "event is " + _event + "\r\n" ); break;
+			case "EVENT"	: _event = tokens[1]; System.out.println(Time.toHMSString(Time.getTime()) + " " + "event is " + _event ); _printer.append("event is " + _event + "\r\n" ); break;
 			case "DNF"		: if(_curRun != null) DNF();break;
 			case "CANCEL"	: CANCEL();break;
 			case "TOG"		: TOG(Integer.parseInt(tokens[1]) - 1);break; // channels stored 0-7, input given 1-8 -> decrement by 1 for right offset
 			case "TRIG"		: TRIG(Integer.parseInt(tokens[1])- 1);break;
 			case "START"	: START(); break;
 			case "FINISH"	: FINISH();  break;
-			case "NUM" 		: if (_curRun != null)  _curRun.add(tokens[1]);	  break;
+			case "NUM" 		: if (_curRun != null)  _curRun.add(tokens[1],_printer);  break;
 			case "NEWRUN"	: newRun();	  break;
 			case "ENDRUN"	: endRun();   break;
 			case "PRINT"	: Print() ;   break;
@@ -80,14 +80,14 @@ public class Chronotimer {
 		if(!power) {		// if power is off turn it on and disarm all channels
 			power = true;
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power On");
-			_printer.append(Time.toHMSString(Time.getTime()) + " Power On" + "\r\n");
+			_printer.append("Power On" + "\r\n");
 			RESET();
 			
 		}
 		else {
 			power = false;
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power Off");
-			_printer.append(Time.toHMSString(Time.getTime()) + " Power Off" + "\r\n");
+			_printer.append("Power Off" + "\r\n");
 		}
 	}
 	private void EXIT() {
@@ -113,14 +113,14 @@ public class Chronotimer {
 	private void DNF() {		//current racer in race receives DNF
 		_curRacer.DNF();
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!");
-		_printer.append(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
+		_printer.append("Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
 		_finished.add(_racers.remove(_racers.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
 	}
 	private void CANCEL() {
 			
 		_curRacer.resetTime();		  //null and void all of current racer's times
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line" );
-		_printer.append(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line"  + "\r\n");
+		_printer.append("Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line"  + "\r\n");
 		_curRun.pushRacer(_curRacer); //push racer to start of queue
 		
 	}
@@ -130,11 +130,11 @@ public class Chronotimer {
 		_channels[i].toggleState();
 		if(_channels[i].getState()) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is active.");
-			_printer.append(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is active." + "\r\n");
+			_printer.append(_channels[i].getNum() + " is active." + "\r\n");
 		}
 		else {
 			System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is Shutting Down.");
-			_printer.append(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is Shutting Down." + "\r\n");
+			_printer.append(_channels[i].getNum() + " is Shutting Down." + "\r\n");
 		}
 	}
 	
@@ -157,7 +157,7 @@ public class Chronotimer {
 					_curRacer.start();
 					_racers.add(_curRacer); // add racer to racers: currently racing queue
 					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-					_printer.append(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 				}
 				
 			}
@@ -166,7 +166,7 @@ public class Chronotimer {
 				_curRacer.start();
 				_racers.add(_curRacer); // add racer to racers: currently racing queue
 				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-				_printer.append(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 			}
 			
 		}
@@ -176,7 +176,7 @@ public class Chronotimer {
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
-			_printer.append(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
+			_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
 		}
 		//else do nothing
 	}
@@ -188,7 +188,7 @@ public class Chronotimer {
 			_curRacer.start();
 			_racers.add(_curRacer); // add racer to racers: currently racing queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() );
-			_printer.append(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+			_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 		}
 
 	}
@@ -200,7 +200,7 @@ public class Chronotimer {
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " + _curRacer.getFinish() );
-			_printer.append(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " + _curRacer.getFinish() + "\r\n");
+			_printer.append("Finish time for " + _curRacer.getName() + " is " + _curRacer.getFinish() + "\r\n");
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class Chronotimer {
 		if(_curRun == null) {
 			_curRun = new Run(_event, ++_runNum);
 			System.out.println(Time.toHMSString(Time.getTime()) + " Current event " + _curRun.getCurEvent() + " is running");
-			_printer.append(Time.toHMSString(Time.getTime()) + " Current event " + _curRun.getCurEvent() + " is running\r\n");
+			_printer.append("Current event " + _curRun.getCurEvent() + " is running\r\n");
 		}
 	}
 	
@@ -218,11 +218,11 @@ public class Chronotimer {
 	private void endRun() {
 		if(_curRun == null) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " no run currently active");
-			_printer.append(Time.toHMSString(Time.getTime()) + " no run currently active\r\n");
+			_printer.append("no run currently active\r\n");
 		}
 		else {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
-			_printer.append(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
+			_printer.append("Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
 			_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
 			_curRun = null;				//deactivate run
 			_finished.clear();			//clear all racers from finished queue;
@@ -234,12 +234,12 @@ public class Chronotimer {
 	private void Print() {
 		if(_finished.size() == 0) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " No times to report");
-			_printer.append(Time.toHMSString(Time.getTime()) + " No times to report" + "\r\n");
+			_printer.append("No times to report" + "\r\n");
 		}
 		else {
 			for(int i = 0 ; i < _finished.size(); i++) {
 				System.out.println(Time.toHMSString(Time.getTime()) + " Racer " + _finished.get(i).getName() + " runtime is " + _finished.get(i).getRaceTime());
-				_printer.append(Time.toHMSString(Time.getTime()) + " Racer " + _finished.get(i).getName() + " runtime is " + _finished.get(i).getRaceTime() + "\r\n");
+				_printer.append("Racer " + _finished.get(i).getName() + " runtime is " + _finished.get(i).getRaceTime() + "\r\n");
 			}
 		}
 	}
