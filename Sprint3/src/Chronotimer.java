@@ -81,13 +81,12 @@ public class Chronotimer {
 			power = true;
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power On");
 			_printer.append("Power On" + "\r\n");
-			RESET();
+			
 			
 		}
 		else {
 			power = false;
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power Off");
-			_printer.append("Power Off" + "\r\n");
 		}
 	}
 	private void EXIT() {
@@ -261,9 +260,12 @@ public class Chronotimer {
 			           file.write(out);									//write jSON string to file
 			           File f = new File("Run" + runNumber + ".txt");	//open freshly created file 
 			           System.out.println(f.getAbsolutePath());			//find path to where file was created 
+			           System.out.println(Time.toHMSString(Time.getTime()) + " " + runNumber + " Successfully exported");
+			           _printer.append(runNumber + " Successfully exported\n");
 			           file.close(); 
 			          }catch(Exception e){
 			        	  System.out.println(e);
+			        	  _printer.append(e + "\n");
 			          }  
 			}
 			else {

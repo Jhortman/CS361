@@ -336,10 +336,6 @@ public class ChronotimerGUI extends JFrame {
 		 			_ch7.setSelected(false);
 		 			_ch8.setSelected(false);
 		 			printerTextArea.setText("");
-		 		
-		 			_c.COMMANDS("POWER");
-		 			_sensorBox.setSelectedIndex(0);
-		 			
 		 			_chOne.setSelected(false);
 		 			_chTwo.setSelected(false);
 		 			_chThree.setSelected(false);
@@ -348,6 +344,9 @@ public class ChronotimerGUI extends JFrame {
 		 			_chSix.setSelected(false);
 		 			_chSeven.setSelected(false);
 		 			_chEight.setSelected(false);
+		 			_sensorBox.setSelectedIndex(0);
+		 			_c.COMMANDS("POWER");
+		 			
 		 	}
 		 	
 		 	// START
@@ -401,8 +400,9 @@ public class ChronotimerGUI extends JFrame {
 		 	
 		 	
 		 	//SWAP
-		 	if(event.getSource().equals(_swap)) _c.COMMANDS("SWAP");
+		 	else if(event.getSource().equals(_swap)) _c.COMMANDS("SWAP");
 		 	
+		 	else {}
 		}
 	}	
 	
@@ -497,7 +497,25 @@ public class ChronotimerGUI extends JFrame {
 				_c.COMMANDS("RESET");
 			}
 			if(event.getSource().equals(_export)) {
-			//TODO	_c.COMMANDS("EXPORT " + _c.getRun().getRunNum() );
+				//Exact same method for adding bib nums, in this case we just run number that we want to export to file 
+				Document document = printerTextArea.getDocument();
+				Element rootElem = document.getDefaultRootElement();
+				int numLines = rootElem.getElementCount();
+				Element lineElem = rootElem.getElement(numLines - 1);
+				int lineStart = lineElem.getStartOffset();
+				int lineEnd = lineElem.getEndOffset();
+				
+				String lineText = "";
+				
+				try {
+					lineText = document.getText(lineStart, lineEnd - lineStart);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+				lineText = lineText.trim();
+				printerTextArea.append("\n");
+				
+				_c.COMMANDS("EXPORT " + lineText);
 			}
 			if(event.getSource().equals(_eventIND)) {
 				_c.COMMANDS("EVENT IND");
