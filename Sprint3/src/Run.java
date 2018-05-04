@@ -28,9 +28,15 @@ public class Run {
 	}
 	
 	public void add(String bibNum, JTextArea printer) {			//add racer to end of queue; if queue is empty -> start
+		for(Racer r: _queue) {
+			if(r.getName().equals(bibNum)) {
+				System.out.println(Time.toHMSString(Time.getTime()) + " Racer " + bibNum + " already queued in current run");
+				printer.append("Racer " + bibNum + " already queued in current run\n");
+				return;
+			}
+		}
+		
 		int compare = Integer.parseInt(bibNum);
-		
-		
 		if(compare < 0 || compare > 99999) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid bib number");
 			printer.append(" Invalid bib number\n");

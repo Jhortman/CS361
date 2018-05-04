@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import javax.swing.JTextArea;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.File;
 import java.io.FileWriter;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ public class Chronotimer {
 	private LinkedList<Racer> _racing;
 	private LinkedList<Racer> _finished;
 	private LinkedList<Racer> _tempFinished;
+	private HashMap<Integer, Racer> _racingMap;
 	private boolean power;
 	private Time time;
 	private static int _runNum = 0;
@@ -35,6 +37,7 @@ public class Chronotimer {
 		_racing = new LinkedList<Racer>();
 		_finished = new LinkedList<Racer>();
 		_tempFinished = new LinkedList<Racer>();
+		_racingMap = new HashMap<Integer,Racer>();
 		time = new Time();
 		_printer = printer;
 	}
@@ -100,7 +103,7 @@ public class Chronotimer {
 		_event = null;							// reset event
 		_finished.clear();						//clear all racers from finished queue;
 		_racing.clear();						//clear all racers from active queue;
-		_tempFinished.clear();					//clear all racers from temp quueue;
+		_tempFinished.clear();					//clear all racers from temp queue;
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
@@ -151,11 +154,23 @@ public class Chronotimer {
 		}
 		
 		//allows start triggers to occur only if there is an active run/ racers in queue / channel is on / and odd parity
-		if(_curRun.hasRacers() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 1)){
+		if((_curRun.hasRacers() || _curRun.getCurEvent().equals("PARGRP")) && _channels[i].getState() && ((_channels[i].getNum() % 2) == 1)){
 			
-			if(_curRun.getCurEvent().toUpperCase().equals("GRP")){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
-				startGRP();
+			if(_curRun.getCurEvent().toUpperCase().equals("GRP") && _channels[i].getNum() == 1){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
+				startGRP();	
+			}
+			else if (_curRun.getCurEvent().toUpperCase().equals("PARGRP") && _channels[i].getNum() == 1) {
+				if(!_racing.isEmpty()) {
+					trigFinishParGrp(_channels[i].getNum());
+					//for when we hit channel one again to trigger a finish instead of a start for PARGRP
+				}
+				else {
+					startGRP();	//PARGRP has same start manner as GRP
+				}
 				
+			}
+			else if(_curRun.getCurEvent().toUpperCase().equals("PARGRP") && _channels[i].getNum() != 1) {
+				trigFinishParGrp(_channels[i].getNum());
 			}
 			else{
 				_curRacer = _curRun.popRacer(); //pop racer from start queue 
@@ -170,6 +185,9 @@ public class Chronotimer {
 		if(!_racing.isEmpty() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 0)){// trigger finish only if channel is on and parity is even 
 			if(_curRun.getCurEvent().toUpperCase().equals("GRP")){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
 				finishGRP();
+			}
+			else if(_curRun.getCurEvent().toUpperCase().equals("PARGRP")) {
+				trigFinishParGrp(_channels[i].getNum());
 			}
 			else {
 			_curRacer = _racing.removeFirst(); // first in first to finish 
@@ -349,9 +367,18 @@ public class Chronotimer {
 			_curRacer = _curRun.popRacer(); //pop racer from start queue 
 			_curRacer.start();
 			_racing.add(_curRacer); // add racer to racers: currently racing queue
-			System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-			_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+			
+			if(_curRun.getCurEvent().toUpperCase().equals("PARGRP") && j < 8) {
+				_racingMap.put(j+1,_curRacer);				//use size of those currently racing to dictate the keys and also line up with channel lanes
+				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " in lane " + (j+1) + " is " + _curRacer.getStart());
+				_printer.append("Start time for " + _curRacer.getName() + " in lane " + (j+1) + " is " + _curRacer.getStart() + "\r\n");
+			}
+			else {
+				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+			}
 		}
+		
 	}
 	
 	//shoves current racers into a temporary queue in which they are to be sorted later with their proper finish times
@@ -402,6 +429,30 @@ public class Chronotimer {
 		
 		
 	}
+	private void trigFinishParGrp(int i) {
+		if(_racingMap.isEmpty()) {
+			return;
+		}
+		
+		
+		if(_racingMap.containsKey(i)) {
+			Racer temp = _racingMap.get(i);
+			_racingMap.remove(i);
+			
+			for(int j = 0; j < _racing.size();j++) {
+				if(_racing.get(j).getName().equals(temp.getName())) {
+					_curRacer = _racing.remove(j);
+					_curRacer.finish();
+					_finished.add(_curRacer);
+					System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " in lane " + i + " is " + _curRacer.getFinish() );
+					_printer.append("Finish time for " + _curRacer.getName() + " in lane " + i + " is " + _curRacer.getFinish() + "\r\n");
+				}
+			}
+			
+		}
+		
+	}
+	
 	
 
 }
