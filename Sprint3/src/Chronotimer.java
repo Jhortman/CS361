@@ -17,6 +17,7 @@ public class Chronotimer {
 	private ArrayList<Storage> _storage;
 	private LinkedList<Racer> _racing;
 	private LinkedList<Racer> _finished;
+	private LinkedList<Racer> _tempFinished;
 	private boolean power;
 	private Time time;
 	private static int _runNum = 0;
@@ -33,6 +34,7 @@ public class Chronotimer {
 		_storage = new ArrayList<Storage>();
 		_racing = new LinkedList<Racer>();
 		_finished = new LinkedList<Racer>();
+		_tempFinished = new LinkedList<Racer>();
 		time = new Time();
 		_printer = printer;
 	}
@@ -98,6 +100,7 @@ public class Chronotimer {
 		_event = null;							// reset event
 		_finished.clear();						//clear all racers from finished queue;
 		_racing.clear();						//clear all racers from active queue;
+		_tempFinished.clear();					//clear all racers from temp quueue;
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
@@ -151,15 +154,7 @@ public class Chronotimer {
 		if(_curRun.hasRacers() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 1)){
 			
 			if(_curRun.getCurEvent().toUpperCase().equals("GRP")){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
-				int qsize = _curRun.getRacers().size();
-				for(int j = 0; j < qsize; j++){			//iterate through queue popping all racers
-					
-					_curRacer = _curRun.popRacer(); //pop racer from start queue 
-					_curRacer.start();
-					_racing.add(_curRacer); // add racer to racers: currently racing queue
-					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
-				}
+				startGRP();
 				
 			}
 			else{
@@ -173,11 +168,16 @@ public class Chronotimer {
 		}
 		//allows finish triggers to occur only if there is an active run/ active racer / channel is on / and even parity
 		if(!_racing.isEmpty() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 0)){// trigger finish only if channel is on and parity is even 
+			if(_curRun.getCurEvent().toUpperCase().equals("GRP")){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
+				finishGRP();
+			}
+			else {
 			_curRacer = _racing.removeFirst(); // first in first to finish 
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
 			_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
+			}
 		}
 		//else do nothing
 	}
@@ -222,12 +222,23 @@ public class Chronotimer {
 			_printer.append("no run currently active\r\n");
 		}
 		else {
+			if(!_racing.isEmpty()) {		//any racers still racing while event ends receive a DNF
+				int qsize = _racing.size();
+				for(int j = 0; j < qsize;j++) {
+					_curRacer = _racing.removeFirst();
+					_curRacer.DNF();
+					_finished.add(_curRacer);
+				}
+			}
+			
 			System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
 			_printer.append("Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
 			_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
 			_curRun = null;				//deactivate run
 			_finished.clear();			//clear all racers from finished queue;
 			_racing.clear();			//clear all racers from active queue;
+			_tempFinished.clear();		//clear all racers from temp quueue;
+			
 		}
 	}
 	
@@ -277,8 +288,9 @@ public class Chronotimer {
 			
 	}
 	
+	//method only usable during IND event and swaps the next two racers to finish 
 	private void swap() {
-		if(_racing.size() >= 2 && _curRun.getCurEvent().equals("IND")) {
+		if(_racing.size() >= 2 && _curRun.getCurEvent().equals("IND")) {	// need atleast two people racing in order to swap
 			
 			//next two to finish for IND are swapped in the current racing queue
 			Racer temp = _racing.get(0);
@@ -293,6 +305,7 @@ public class Chronotimer {
 		}
 	}
 	
+	//try to set sensortype to channel from given sensor/channel
 	private void conn(String s, int i) {
 		try {
 			if (s.toUpperCase().equals("EYE")  || 
@@ -313,6 +326,7 @@ public class Chronotimer {
 		
 		}
 	}
+	//try to disconnect sensor from given channel --> set sensor type to NONE
 	private void disc(int i) {
 		try {
 			if(!_channels[i].getSensor().equals("NONE")) {
@@ -325,5 +339,69 @@ public class Chronotimer {
 			_printer.append("Invalid channel number\n");
 		}
 	}
+	
+	//if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
+	//method written to reduce clutter in trig method
+	private void startGRP() {
+		int qsize = _curRun.getRacers().size();
+		for(int j = 0; j < qsize; j++){			//iterate through queue popping all racers
+			
+			_curRacer = _curRun.popRacer(); //pop racer from start queue 
+			_curRacer.start();
+			_racing.add(_curRacer); // add racer to racers: currently racing queue
+			System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+			_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+		}
+	}
+	
+	//shoves current racers into a temporary queue in which they are to be sorted later with their proper finish times
+	private void finishGRP() {
+		
+		_curRacer = _racing.removeFirst(); // first in first to finish 
+		_curRacer.finish();
+		_tempFinished.add(_curRacer);  // add racer to temp finished queue
+		System.out.println(Time.toHMSString(Time.getTime()) + " Finish recorded at " + _curRacer.getFinish());
+		_printer.append("Finish recorded at " + _curRacer.getFinish() + "\r\n");
+		
+		if(_racing.isEmpty()) {
+			System.out.println(Time.toHMSString(Time.getTime()) + " All racers have finished! Please enter bib nums in order: 1st, 2nd, 3rd...using keypad (press # to enter)");
+			_printer.append("All racers have finished! Please enter bib nums in order: 1st, 2nd, 3rd...using keypad (press # to enter)\n");
+		}
+	}
+	
+	//method for inputting finishes 
+	public void inputGrpFinish(String bibnum) {
+		if(_tempFinished.isEmpty()) {
+			return;
+		}
+		
+		for(int i = 0; i < _tempFinished.size(); i++) {
+			
+			//if found then valid bibnum
+			//if bibnum is found in queue swap their finish time with index 0 (if racer already has proper order in queue it can still swap with itself)
+			if(_tempFinished.get(i).getName().equals(bibnum)) {
+				
+				//swap racer to position one
+				Racer temp = _tempFinished.get(0);
+				_tempFinished.set(0, _tempFinished.get(i));
+				_tempFinished.set(i, temp);	
+				
+				//swap finish times between two racers
+				_curRun.swapFinish(_tempFinished.get(0),_tempFinished.get(i));
+				
+				System.out.println(Time.toHMSString(Time.getTime()) + " Racer " + _tempFinished.get(0).getName() + "'s new finish time is " + _tempFinished.get(0).getFinish());
+				_printer.append("Racer " + _tempFinished.get(0).getName() + "'s new finish time is " + _tempFinished.get(0).getFinish() + "\n");
+				_finished.add(_tempFinished.removeFirst());			//add finalized finish time for given racer into official finished racers queue used to be used in storage
+				
+				return;
+			}
+		}
+		//no racers found in tempFinish or invalid bib number: print and do nothing
+		System.out.println(" Bibnum not associated with this race");
+		_printer.append("Bibnum not associated with this race\n");
+		
+		
+	}
+	
 
 }

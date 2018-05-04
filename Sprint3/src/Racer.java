@@ -32,6 +32,21 @@ public class Racer{
 		return raceTime;
 	}
 	
+	public long getFinishAsLong() {
+				return finish;
+			}
+	
+	public long getStartAsLong() {
+				return start;
+			}
+			
+	public void setFinish(long fin) {
+				finish = fin;
+			}
+	
+	public void setRaceTime(String time) {
+				raceTime = time;
+			}
 	
 	// make static call to time class to access method that gets the right system time to assign
 	public void start() {

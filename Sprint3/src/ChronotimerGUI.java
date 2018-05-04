@@ -39,14 +39,15 @@ public class ChronotimerGUI extends JFrame {
 	private JButton _kp0 = new JButton("0");
 	private JButton _kpS = new JButton("*");
 	private JButton _kpP = new JButton("#");
+	
 	//Jmenu items for function
 	private JMenuItem _newRun = new JMenuItem("NEWRUN");
 	private JMenuItem _endRun = new JMenuItem("ENDRUN");
 	private JMenuItem _DNF = new JMenuItem("DNF");
 	private JMenuItem _cancel = new JMenuItem("CANCEL");
 	private JMenuItem _num = new JMenuItem("NUM");
-	private JMenuItem _time = new JMenuItem("TIME");
 	private JMenuItem _reset = new JMenuItem("RESET");
+	private JMenuItem _print = new JMenuItem("PRINT");
 	private JMenuItem _export = new JMenuItem("EXPORT");
 	private JMenu _eventMenu = new JMenu("EVENT");				//need submenu for events
 	
@@ -71,7 +72,7 @@ public class ChronotimerGUI extends JFrame {
 	private JComboBox _sensorBox = new JComboBox(sensorTypes);
 	
 	
-	
+	//power buttons | swap | function menu
 	private JButton _power = new JButton("POWER");
 	private JButton _printerPower = new JButton("PRINTER POWER");	
 	private JButton _swap = new JButton("SWAP");
@@ -184,11 +185,11 @@ public class ChronotimerGUI extends JFrame {
 		_functionMenu.add(_endRun);
 		_functionMenu.add(_eventMenu);
 		_functionMenu.add(_num);
-		_functionMenu.add(_time);
 		_functionMenu.add(_endRun);
 		_functionMenu.add(_DNF);
 		_functionMenu.add(_cancel);
 		_functionMenu.add(_reset);
+		_functionMenu.add(_print);
 		_functionMenu.add(_export);
 		
 		//add submenu items to event menu
@@ -289,8 +290,8 @@ public class ChronotimerGUI extends JFrame {
 		_cancel.addActionListener(new MenuListener());
 		_num.addActionListener(new MenuListener());
 		_export.addActionListener(new MenuListener());
-		_time.addActionListener(new MenuListener());
 		_reset.addActionListener(new MenuListener());
+		_print.addActionListener(new MenuListener());
 		
 		_eventIND.addActionListener(new MenuListener());
 		_eventPARIND.addActionListener(new MenuListener());
@@ -312,10 +313,6 @@ public class ChronotimerGUI extends JFrame {
 		_chSix.addActionListener(new ClickListener());
 		_chSeven.addActionListener(new ClickListener());
 		_chEight.addActionListener(new ClickListener());
-		
-		
-		
-		
 		
 	}
 	
@@ -431,22 +428,27 @@ public class ChronotimerGUI extends JFrame {
 				//create racer object and then add it to queue then clear text area
 				//check for numbers out of range [0,9999]
 				
-				//will use this for grp race feature
-				Document document = printerTextArea.getDocument();
-				Element rootElem = document.getDefaultRootElement();
-				int numLines = rootElem.getElementCount();
-				Element lineElem = rootElem.getElement(numLines - 2);
-				int lineStart = lineElem.getStartOffset();
-				int lineEnd = lineElem.getEndOffset();
+				//will use this for grp race feature as well
+				if(_c.getRun().getCurEvent().equals("GRP")) {
+					Document document = printerTextArea.getDocument();
+					Element rootElem = document.getDefaultRootElement();
+					int numLines = rootElem.getElementCount();
+					Element lineElem = rootElem.getElement(numLines - 1);
+					int lineStart = lineElem.getStartOffset();
+					int lineEnd = lineElem.getEndOffset();
 				
+					String lineText = "";
 				
-				
-				try {
-					String lineText = document.getText(lineStart, lineEnd - lineStart);
-				} catch (BadLocationException e) {
-					e.printStackTrace();
+					try {
+						lineText = document.getText(lineStart, lineEnd - lineStart);
+					} catch (BadLocationException e) {
+						e.printStackTrace();
+					}
+					lineText = lineText.trim();
+					printerTextArea.append("\n");
+					
+					_c.inputGrpFinish(lineText);
 				}
-				
 			}
 			
 			
@@ -463,10 +465,10 @@ public class ChronotimerGUI extends JFrame {
 			if(event.getSource().equals(_newRun)) {
 				_c.COMMANDS("NEWRUN");
 			}
-			if(event.getSource().equals(_endRun)) {
+			else if(event.getSource().equals(_endRun)) {
 				_c.COMMANDS("ENDRUN");
 			}
-			if(event.getSource().equals(_num)) {
+			else if(event.getSource().equals(_num)) {
 				//Solution for grabbing just the last line of our printer text field for parsing bib numbers
 				Document document = printerTextArea.getDocument();
 				Element rootElem = document.getDefaultRootElement();
@@ -487,16 +489,37 @@ public class ChronotimerGUI extends JFrame {
 			
 				_c.COMMANDS("NUM " + lineText);
 			}
-			if(event.getSource().equals(_DNF)) {
+			else if(event.getSource().equals(_DNF)) {
 				_c.COMMANDS("DNF");
 			}
-			if(event.getSource().equals(_cancel)) {
+			else if(event.getSource().equals(_cancel)) {
 				_c.COMMANDS("CANCEL");
 			}
-			if(event.getSource().equals(_reset)) {
+			else if(event.getSource().equals(_reset)) {
+				_ch1.setSelected(false);
+	 			_ch2.setSelected(false);
+	 			_ch3.setSelected(false);
+	 			_ch4.setSelected(false);
+	 			_ch5.setSelected(false);
+	 			_ch6.setSelected(false);
+	 			_ch7.setSelected(false);
+	 			_ch8.setSelected(false);
+	 			printerTextArea.setText("");
+	 			_chOne.setSelected(false);
+	 			_chTwo.setSelected(false);
+	 			_chThree.setSelected(false);
+	 			_chFour.setSelected(false);
+	 			_chFive.setSelected(false);
+	 			_chSix.setSelected(false);
+	 			_chSeven.setSelected(false);
+	 			_chEight.setSelected(false);
+	 			_sensorBox.setSelectedIndex(0);
 				_c.COMMANDS("RESET");
 			}
-			if(event.getSource().equals(_export)) {
+			else if(event.getSource().equals(_print)) {
+				_c.COMMANDS("PRINT");
+			}
+			else if(event.getSource().equals(_export)) {
 				//Exact same method for adding bib nums, in this case we just run number that we want to export to file 
 				Document document = printerTextArea.getDocument();
 				Element rootElem = document.getDefaultRootElement();
@@ -515,20 +538,22 @@ public class ChronotimerGUI extends JFrame {
 				lineText = lineText.trim();
 				printerTextArea.append("\n");
 				
+				//be careful of passing in empty/garbage strings over to chronotimer
 				_c.COMMANDS("EXPORT " + lineText);
 			}
-			if(event.getSource().equals(_eventIND)) {
+			else if(event.getSource().equals(_eventIND)) {
 				_c.COMMANDS("EVENT IND");
 			}
-			if(event.getSource().equals(_eventPARIND)) {
+			else if(event.getSource().equals(_eventPARIND)) {
 				_c.COMMANDS("EVENT PARIND");
 			}
-			if(event.getSource().equals(_eventGRP)) {
+			else if(event.getSource().equals(_eventGRP)) {
 				_c.COMMANDS("EVENT GRP");
 			}
-			if(event.getSource().equals(_eventPARGRP)) {
+			else if(event.getSource().equals(_eventPARGRP)) {
 				_c.COMMANDS("EVENT PARGRP");
 			}
+			else {}
 		}
 	}
 	

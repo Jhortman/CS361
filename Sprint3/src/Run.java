@@ -31,7 +31,7 @@ public class Run {
 		int compare = Integer.parseInt(bibNum);
 		
 		
-		if(compare < 0 || compare > 9999) {
+		if(compare < 0 || compare > 99999) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid bib number");
 			printer.append(" Invalid bib number\n");
 		}
@@ -63,6 +63,18 @@ public class Run {
 	public boolean hasRacers() {
 		return !_queue.isEmpty();
 	}
+	
+	//swap passed in racers finish times.  
+	public void swapFinish(Racer racerOne, Racer racerTwo) {
+		long temp = racerOne.getFinishAsLong();
+				
+		racerOne.setFinish(racerTwo.getFinishAsLong());
+		racerTwo.setFinish(temp);
+				
+		racerOne.setRaceTime(Time.toHMSString(racerOne.getFinishAsLong() - racerOne.getStartAsLong()));
+		racerTwo.setRaceTime(Time.toHMSString(racerTwo.getFinishAsLong() - racerTwo.getStartAsLong()));
+			
+		}
 	
 	//get run number
 	public int getRunNum() { return _runNum; }
