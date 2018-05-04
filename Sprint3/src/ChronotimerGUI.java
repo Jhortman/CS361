@@ -56,8 +56,19 @@ public class ChronotimerGUI extends JFrame {
 	private JMenuItem _eventGRP = new JMenuItem("GRP");
 	private JMenuItem _eventPARGRP = new JMenuItem("PARGRP");
 	
+	//jradio buttons for attaching sensors
+	private JRadioButton _chOne = new JRadioButton();
+	private JRadioButton _chTwo = new JRadioButton();
+	private JRadioButton _chThree = new JRadioButton();
+	private JRadioButton _chFour = new JRadioButton();
+	private JRadioButton _chFive = new JRadioButton();
+	private JRadioButton _chSix = new JRadioButton();
+	private JRadioButton _chSeven = new JRadioButton();
+	private JRadioButton _chEight = new JRadioButton();
 	
-	
+	//initialize JCombobox to handle different types of sensors
+	private String[] sensorTypes = {"NONE","EYE","GATE","PAD"};
+	private JComboBox _sensorBox = new JComboBox(sensorTypes);
 	
 	
 	
@@ -86,7 +97,7 @@ public class ChronotimerGUI extends JFrame {
 	
 	public ChronotimerGUI(){		
 		setTitle("CHRONOTIMER 1009");
-        setSize(800, 400);
+        setSize(1000, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
         createDisplay();
@@ -189,17 +200,39 @@ public class ChronotimerGUI extends JFrame {
 		//want to fiddle around with positioning of menu bar in future
 		_functionBar.add(_functionMenu);
 		
-		// Southwest - swap button
+		// Southwest - swap button , function, channels for connecting different sensors
 		JPanel functionPanel = new JPanel(new GridLayout(3,1));
-		JTextArea tf1 = new JTextArea(10, 20);
-		tf1.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-		tf1.setEditable(false);
-		JTextArea tf2 = new JTextArea(10, 20);
-		tf2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-		tf2.setEditable(false);
+		
+		//create panel to hold all our channels in radiobutton form for connecting/disconnecting sensor types.
+		JPanel _channelPanel = new JPanel(new GridLayout(4,4));
+		
+		JLabel numOne, numTwo, numThree, numFour, numFive, numSix, numSeven, numEight;
+		
+		//initialize new JLabels (was getting unpredictable results reusing JLabels from above)
+		numOne = new JLabel("1");	numTwo = new JLabel("2");
+		numThree = new JLabel("3");	numFour = new JLabel("4");
+		numFive = new JLabel("5");	numSix = new JLabel("6");
+		numSeven = new JLabel("7");	numEight = new JLabel("8");
+		
+		//add channels to panel
+		_channelPanel.add(numOne);	  _channelPanel.add(numThree);  	  _channelPanel.add(numFive);	 _channelPanel.add(numSeven);
+		_channelPanel.add(_chOne); _channelPanel.add(_chThree); _channelPanel.add(_chFive); _channelPanel.add(_chSeven);
+		_channelPanel.add(numTwo);	  _channelPanel.add(numFour); 	  _channelPanel.add(numSix);	 _channelPanel.add(numEight);
+		_channelPanel.add(_chTwo); _channelPanel.add(_chFour);  _channelPanel.add(_chSix);  _channelPanel.add(_chEight);
+		
+		//stick channel panel into another panel to make room for jcombobox
+		JPanel channelPanelContainer = new JPanel(new GridLayout(2,1));
+		
+		channelPanelContainer.add(_sensorBox,BorderLayout.NORTH);
+		channelPanelContainer.add(_channelPanel, BorderLayout.SOUTH);
+		
+		_sensorBox.setSelectedIndex(0);			//default selection will be NONE for sensor types
+		
+		//Adding to southwest corner of the timer
+		
 		functionPanel.add(_functionBar, BorderLayout.NORTH);
 		functionPanel.add(_swap, BorderLayout.CENTER);
-		functionPanel.add(tf2, BorderLayout.SOUTH);
+		functionPanel.add(channelPanelContainer, BorderLayout.SOUTH);
 	
 		
 		
@@ -264,7 +297,25 @@ public class ChronotimerGUI extends JFrame {
 		_eventGRP.addActionListener(new MenuListener());
 		_eventPARGRP.addActionListener(new MenuListener());
 		
+		
+		
 		_swap.addActionListener(new ClickListener());
+		
+		
+		//add action listeners for attaching sensors to channels
+		
+		_chOne.addActionListener(new ClickListener());
+		_chTwo.addActionListener(new ClickListener());
+		_chThree.addActionListener(new ClickListener());
+		_chFour.addActionListener(new ClickListener());
+		_chFive.addActionListener(new ClickListener());
+		_chSix.addActionListener(new ClickListener());
+		_chSeven.addActionListener(new ClickListener());
+		_chEight.addActionListener(new ClickListener());
+		
+		
+		
+		
 		
 	}
 	
@@ -287,6 +338,16 @@ public class ChronotimerGUI extends JFrame {
 		 			printerTextArea.setText("");
 		 		
 		 			_c.COMMANDS("POWER");
+		 			_sensorBox.setSelectedIndex(0);
+		 			
+		 			_chOne.setSelected(false);
+		 			_chTwo.setSelected(false);
+		 			_chThree.setSelected(false);
+		 			_chFour.setSelected(false);
+		 			_chFive.setSelected(false);
+		 			_chSix.setSelected(false);
+		 			_chSeven.setSelected(false);
+		 			_chEight.setSelected(false);
 		 	}
 		 	
 		 	// START
@@ -311,8 +372,35 @@ public class ChronotimerGUI extends JFrame {
 		 	else if(event.getSource().equals(_ch7)) _c.COMMANDS("TOG 7");
 		 	else if(event.getSource().equals(_ch8)) _c.COMMANDS("TOG 8");
 		 	
-		 	//Swap - TODO
+		 	// CONNECT | DISCONNECT
 		 	
+		 	else if(event.getSource().equals(_chOne)) {
+		 		if(!_chOne.isSelected())	_c.COMMANDS("DISC 1");else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 1");
+		 	}
+		 	else if(event.getSource().equals(_chTwo)) {
+		 		if(!_chTwo.isSelected()) _c.COMMANDS("DISC 2"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 2");
+		 	}	
+		 	else if(event.getSource().equals(_chThree)){
+		 		if(!_chThree.isSelected()) _c.COMMANDS("DISC 3"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 3");
+		 	}	
+		 	else if(event.getSource().equals(_chFour)) {
+		 		if(!_chFour.isSelected()) _c.COMMANDS("DISC 4"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 4");
+		 	}	
+		 	else if(event.getSource().equals(_chFive)) {
+		 		if(!_chFive.isSelected()) _c.COMMANDS("DISC 5"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 5");
+		 	}	
+		 	else if(event.getSource().equals(_chSix)) {
+		 		if(!_chSix.isSelected()) _c.COMMANDS("DISC 6"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 6");
+		 	}	
+		 	else if(event.getSource().equals(_chSeven)){
+		 		if(!_chSeven.isSelected()) _c.COMMANDS("DISC 7"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 7");
+		 	}	
+		 	else if(event.getSource().equals(_chEight)) {
+		 		if(!_chEight.isSelected()) _c.COMMANDS("DISC 8"); else _c.COMMANDS("CONN " +  _sensorBox.getSelectedItem() + " 8");
+		 	}	
+		 	
+		 	
+		 	//SWAP
 		 	if(event.getSource().equals(_swap)) _c.COMMANDS("SWAP");
 		 	
 		}
@@ -323,6 +411,7 @@ public class ChronotimerGUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent event) 
 		{
+			//KEYPAD
 			
 			if(event.getSource().equals(_kp1)) printerTextArea.append("1");
 			if(event.getSource().equals(_kp2)) printerTextArea.append("2");
@@ -341,6 +430,8 @@ public class ChronotimerGUI extends JFrame {
 			if(event.getSource().equals(_kpP)) {
 				//create racer object and then add it to queue then clear text area
 				//check for numbers out of range [0,9999]
+				
+				//will use this for grp race feature
 				Document document = printerTextArea.getDocument();
 				Element rootElem = document.getDefaultRootElement();
 				int numLines = rootElem.getElementCount();
@@ -422,4 +513,5 @@ public class ChronotimerGUI extends JFrame {
 			}
 		}
 	}
+	
 }

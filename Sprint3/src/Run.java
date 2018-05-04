@@ -58,18 +58,6 @@ public class Run {
 	public LinkedList<Racer> getRacers(){
 		return _queue;
 	}
-	//swap out passed in racer finish times with current racer finish time. 
-	// might modify method later to handle two passed in racers. 
-	public void swapFinish(Racer racerOne, Racer racerTwo) {
-		long temp = racerOne.getFinishAsLong();
-			
-		racerOne.setFinish(racerTwo.getFinishAsLong());
-		racerTwo.setFinish(temp);
-			
-		racerTwo.setRaceTime(Time.toHMSString(racerTwo.getFinishAsLong() - racerTwo.getStartAsLong()));
-		racerOne.setRaceTime(Time.toHMSString(racerOne.getFinishAsLong() - racerOne.getStartAsLong()));
-		
-		}
 	
 	//returns true if we have racers waiting to race in queue
 	public boolean hasRacers() {

@@ -7,7 +7,7 @@ public class Channel {
 	public Channel(int i) {
 		_state = false;
 		_number = i + 1;
-		_sensor = null;
+		_sensor = "NONE";
 	}
 	public void toggleState() {
 		_state = !_state;
@@ -21,7 +21,10 @@ public class Channel {
 	public int getNum() {
 		return this._number;
 	}
+	public String getSensor() {
+		return _sensor;
+	}
 	public void disconnect() {
-		_sensor = null;
+		_sensor = "NONE";
 	}
 }

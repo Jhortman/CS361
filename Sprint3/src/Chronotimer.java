@@ -15,7 +15,7 @@ public class Chronotimer {
 	private String _event;
 	private Run _curRun;
 	private ArrayList<Storage> _storage;
-	private LinkedList<Racer> _racers;
+	private LinkedList<Racer> _racing;
 	private LinkedList<Racer> _finished;
 	private boolean power;
 	private Time time;
@@ -31,7 +31,7 @@ public class Chronotimer {
 		power = false;
 		_curRun = null;
 		_storage = new ArrayList<Storage>();
-		_racers = new LinkedList<Racer>();
+		_racing = new LinkedList<Racer>();
 		_finished = new LinkedList<Racer>();
 		time = new Time();
 		_printer = printer;
@@ -69,8 +69,8 @@ public class Chronotimer {
 			case "PRINT"	: Print() ;   break;
 			case "EXPORT"	: Export(Integer.parseInt(tokens[1])); break;
 			case "SWAP"		: swap(); 	  break;
-			case "CONN" 	: conn(tokens[1], Integer.parseInt(tokens[2])); break;
-			case "DISC"		: disc(Integer.parseInt(tokens[1]));			break;
+			case "CONN" 	: conn(tokens[1], Integer.parseInt(tokens[2]) - 1); break;
+			case "DISC"		: disc(Integer.parseInt(tokens[1]) - 1);			break;
 			
 			default: System.out.println("bad input"); break;
 			 
@@ -98,13 +98,15 @@ public class Chronotimer {
 		time.setTime();							//set time to current time in system
 		_event = null;							// reset event
 		_finished.clear();						//clear all racers from finished queue;
-		_racers.clear();						//clear all racers from active queue;
+		_racing.clear();						//clear all racers from active queue;
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
 				_channels[i].toggleState();		
 			}
 		}
+		System.out.println(Time.toHMSString(Time.getTime()) + " System has been reset");
+		_printer.append("System has been reset\n");
 	
 	}
 	private void TIME(String s) {
@@ -114,7 +116,7 @@ public class Chronotimer {
 		_curRacer.DNF();
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!");
 		_printer.append("Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
-		_finished.add(_racers.remove(_racers.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
+		_finished.add(_racing.remove(_racing.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
 	}
 	private void CANCEL() {
 			
@@ -155,7 +157,7 @@ public class Chronotimer {
 					
 					_curRacer = _curRun.popRacer(); //pop racer from start queue 
 					_curRacer.start();
-					_racers.add(_curRacer); // add racer to racers: currently racing queue
+					_racing.add(_curRacer); // add racer to racers: currently racing queue
 					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
 					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 				}
@@ -164,15 +166,15 @@ public class Chronotimer {
 			else{
 				_curRacer = _curRun.popRacer(); //pop racer from start queue 
 				_curRacer.start();
-				_racers.add(_curRacer); // add racer to racers: currently racing queue
+				_racing.add(_curRacer); // add racer to racers: currently racing queue
 				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
 				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 			}
 			
 		}
 		//allows finish triggers to occur only if there is an active run/ active racer / channel is on / and even parity
-		if(!_racers.isEmpty() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 0)){// trigger finish only if channel is on and parity is even 
-			_curRacer = _racers.removeFirst(); // first in first to finish 
+		if(!_racing.isEmpty() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 0)){// trigger finish only if channel is on and parity is even 
+			_curRacer = _racing.removeFirst(); // first in first to finish 
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
@@ -186,7 +188,7 @@ public class Chronotimer {
 		if(_curRun!= null && _curRun.hasRacers() && _channels[0].getState()) {
 			_curRacer = _curRun.popRacer();
 			_curRacer.start();
-			_racers.add(_curRacer); // add racer to racers: currently racing queue
+			_racing.add(_curRacer); // add racer to racers: currently racing queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() );
 			_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 		}
@@ -195,8 +197,8 @@ public class Chronotimer {
 	//NEED to simplify compound conditionals here 
 	private void FINISH() {  // same as triggering finish on channel 2
 		
-		if(_curRun!= null && !_racers.isEmpty() && _channels[0].getState()) {
-			_curRacer = _racers.removeFirst(); // first in first to finish 
+		if(_curRun!= null && !_racing.isEmpty() && _channels[0].getState()) {
+			_curRacer = _racing.removeFirst(); // first in first to finish 
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
 			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " + _curRacer.getFinish() );
@@ -226,7 +228,7 @@ public class Chronotimer {
 			_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
 			_curRun = null;				//deactivate run
 			_finished.clear();			//clear all racers from finished queue;
-			_racers.clear();			//clear all racers from active queue;
+			_racing.clear();			//clear all racers from active queue;
 		}
 	}
 	
@@ -247,8 +249,8 @@ public class Chronotimer {
 	private void Export(int runNumber) {
 		String out = "";
 		if(_storage.isEmpty()) {
-			System.out.println("Nothing to export!" );
-			_printer.append("Nothing to export!");
+			System.out.println(Time.toHMSString(Time.getTime()) + " Nothing to export!" );
+			_printer.append("Nothing to export!\n");
 			return;
 		}
 		for(int i = 0; i < _storage.size(); i++) {
@@ -265,7 +267,7 @@ public class Chronotimer {
 			          }  
 			}
 			else {
-				System.out.println("Could not find run number in storage!");
+				System.out.println(Time.toHMSString(Time.getTime()) + " Could not find run number in storage!");
 				_printer.append("Could not find run number in storage!" + "\r\n");
 				return;
 			}
@@ -274,10 +276,18 @@ public class Chronotimer {
 	}
 	
 	private void swap() {
-		if(_racers.size() >= 2 && _event.equals("IND")) {
+		if(_racing.size() >= 2 && _curRun.getCurEvent().equals("IND")) {
 			
-			//next two to finish for IND 
-			_curRun.swapFinish(_racers.get(0), _racers.get(1));
+			//next two to finish for IND are swapped in the current racing queue
+			Racer temp = _racing.get(0);
+			_racing.set(0, _racing.get(1));
+			_racing.set(1, temp);	
+			System.out.println(Time.toHMSString(Time.getTime()) + " " + _racing.get(1).getName() + " and " + _racing.get(0).getName() + " have been swapped");
+			_printer.append(_racing.get(1) + " and " + _racing.get(0) + " have been swapped\n");
+		}
+		else {
+			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid conditions for Swap");
+			_printer.append("Invalid conditions for swap\n");
 		}
 	}
 	
@@ -285,17 +295,32 @@ public class Chronotimer {
 		try {
 			if (s.toUpperCase().equals("EYE")  || 
 				s.toUpperCase().equals("GATE") ||
-				s.toUpperCase().equals("PAD")    ) _channels[i].setSensor(s);
-			else System.out.println("Unknown sensor type '" + s + "'");
+				s.toUpperCase().equals("PAD")) {
+				_channels[i].setSensor(s);
+				System.out.println(Time.toHMSString(Time.getTime()) + " " +_channels[i].getSensor() + " is connected to " + _channels[i].getNum());
+				_printer.append(" " +_channels[i].getSensor() + " is connected to " + _channels[i].getNum() + "\n");
+			}
+			else if(s.toUpperCase().equals("NONE")) {} //do nothing if NONE is sent over from gui
+			else {
+				System.out.println(Time.toHMSString(Time.getTime())+ " Unknown sensor type '" + s + "'");
+				_printer.append(" Unknown sensor type '" + s + "'\n");
+			}
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Invalid channel number");
+			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid channel number");
+			_printer.append("Invalid channel number\n");
+		
 		}
 	}
 	private void disc(int i) {
 		try {
-			_channels[i].disconnect();
+			if(!_channels[i].getSensor().equals("NONE")) {
+				System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getSensor() + " Sensor has been disconected from " + _channels[i].getNum());
+				_printer.append(" " + _channels[i].getSensor() + " Sensor has been disconected from " + _channels[i].getNum() + "\n");
+				_channels[i].disconnect();
+			}
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Invalid channel number");
+			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid channel number");
+			_printer.append("Invalid channel number\n");
 		}
 	}
 
