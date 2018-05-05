@@ -5,10 +5,14 @@ import javax.swing.JTextArea;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 public class Chronotimer {
 	private Channel[] _channels;
@@ -23,7 +27,6 @@ public class Chronotimer {
 	private boolean power;
 	private Time time;
 	private static int _runNum = 0;
-	private Gson g = new Gson();
 	private JTextArea _printer;
 
 	public Chronotimer(JTextArea printer) {
@@ -104,6 +107,7 @@ public class Chronotimer {
 		_finished.clear();						//clear all racers from finished queue;
 		_racing.clear();						//clear all racers from active queue;
 		_tempFinished.clear();					//clear all racers from temp queue;
+		_racingMap.clear();
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
@@ -252,14 +256,20 @@ public class Chronotimer {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
 			_printer.append("Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
 			_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
+			
+			String out = new Gson().toJson(_storage.get(_storage.size()-1));
+			System.out.println(out);
+			sendPost(out);	//Convert last created _storage into JSON using gson to send a post message over to our server
 			_curRun = null;				//deactivate run
 			_finished.clear();			//clear all racers from finished queue;
 			_racing.clear();			//clear all racers from active queue;
 			_tempFinished.clear();		//clear all racers from temp quueue;
+			_racingMap.clear();
+			
+			
 			
 		}
 	}
-	
 	//prints current run of racer
 	private void Print() {
 		if(_finished.size() == 0) {
@@ -285,7 +295,7 @@ public class Chronotimer {
 			if(_storage.get(i).getRun().getRunNum() == runNumber){
 				try{    
 			           FileWriter file = new FileWriter("Run" + runNumber + ".txt");
-			           out = g.toJson(_storage.get(i));					//get object in storage that we want to convert to JSON formatted string
+			           out = new Gson().toJson(_storage.get(i));					//get object in storage that we want to convert to JSON formatted string
 			           file.write(out);									//write jSON string to file
 			           File f = new File("Run" + runNumber + ".txt");	//open freshly created file 
 			           System.out.println(f.getAbsolutePath());			//find path to where file was created 
@@ -450,7 +460,53 @@ public class Chronotimer {
 			}
 			
 		}
-		
+			
+	}
+	
+	private void sendPost(String JSON) {
+		try {
+			System.out.println("in the client");
+
+			// Client will connect to this location
+			URL site = new URL("http://:8000/sendresults");
+			HttpURLConnection conn = (HttpURLConnection) site.openConnection();
+
+			// now create a POST request
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+
+			// build a string that contains JSON from console
+			String content = "";
+			content = JSON;
+
+			// write out string to output buffer for message
+			out.writeBytes(content);
+			out.flush();
+			out.close();
+
+			System.out.println("Done sent to server");
+
+			
+			InputStreamReader inputStr = new InputStreamReader(conn.getInputStream());
+			
+			// string to hold the result of reading in the response
+			StringBuilder sb = new StringBuilder();
+
+			// read the characters from the request byte by byte and build up
+			// the Response
+			int nextChar;
+			while ((nextChar = inputStr.read()) > -1) {
+				sb = sb.append((char) nextChar);
+			}
+			System.out.println("Return String: " + sb);
+			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
 	}
 	
 	
