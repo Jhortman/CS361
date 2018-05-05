@@ -77,8 +77,8 @@ public class Run {
 		racerOne.setFinish(racerTwo.getFinishAsLong());
 		racerTwo.setFinish(temp);
 				
-		racerOne.setRaceTime(Time.toHMSString(racerOne.getFinishAsLong() - racerOne.getStartAsLong()));
-		racerTwo.setRaceTime(Time.toHMSString(racerTwo.getFinishAsLong() - racerTwo.getStartAsLong()));
+		racerOne.setRaceTime(Time.raceHMSString(racerOne.getFinishAsLong() - racerOne.getStartAsLong()));
+		racerTwo.setRaceTime(Time.raceHMSString(racerTwo.getFinishAsLong() - racerTwo.getStartAsLong()));
 			
 		}
 	

@@ -56,7 +56,7 @@ public class Racer{
 	//if successful finish go ahead and calculate racetime
 	public void finish() {
 		finish = Time.getTime();
-		raceTime = Time.toHMSString(finish - start);
+		raceTime = Time.raceHMSString(finish - start);
 		
 	}
 	public void resetTime() {

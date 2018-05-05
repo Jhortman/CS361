@@ -55,7 +55,29 @@ public class Time {
 		if (seconds < 10) ret += "0" + seconds; else ret += seconds;
 		ret += "." + hSeconds;
 		return ret;
-		//return hours + ":" + minutes + ":" + seconds + "." + mSeconds;
+	}
+	//for getting a simplified raceTime
+	protected static String raceHMSString(long time) {
+		String ret = "";
+		
+		long hours = time / 1000 / 60 / 60;
+		long minutes = (time / 1000 / 60) - (hours * 60);
+		long seconds = (time / 1000) - (hours * 60 * 60) - (minutes * 60);
+		long hSeconds = (time - (hours * 60 * 60 * 1000) - (minutes * 60 * 1000) - (seconds * 1000)) / 10; // divided by 10 because we want hundreths not ms
+		
+		if (hours > 24) {		// testing cases for very long inputs 
+			hours = (hours % 12) + 7; // offset for timezone
+		}
+		
+		if(hours > 12) {
+			hours -= 12;
+		}
+		//if hours | minutes | seconds are equal to zero
+		if (hours == 0){} else if (hours < 10) { ret += "0" + hours + ":"; } else ret += hours + ":";
+		if (minutes == 0){} else if (minutes < 10){ ret += "0" + minutes + ":"; } else ret += minutes + ":";
+		if (seconds == 0){} else if (seconds < 10){ ret += "0" + seconds; } else ret += seconds;
+		ret += "." + hSeconds;
+		return ret;
 	}
 	
 	
