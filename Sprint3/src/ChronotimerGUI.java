@@ -79,6 +79,7 @@ public class ChronotimerGUI extends JFrame {
 	private JMenuBar _functionBar = new JMenuBar();
 	private JMenu	_functionMenu	= new JMenu("FUNCTION");
 	private static JTextArea printerTextArea = new JTextArea(5, 20);
+	private static JTextArea raceTextArea = new JTextArea(10, 20);
 	
 	//pass in printerfield to chronotimer for printing events 
 	private static Chronotimer _c = new Chronotimer(printerTextArea);
@@ -121,7 +122,7 @@ public class ChronotimerGUI extends JFrame {
 		activated = new JLabel("Enable/Disable");
 		activated2 = new JLabel("Enable/Disable");
 
-		timerLabel = new JLabel("Queue / Running / Final Time");
+		timerLabel = new JLabel("Queue / Running / Final Time", SwingConstants.CENTER);
 		dummy = new JLabel("");
 		dummy2 = new JLabel("");
 		num1 = new JLabel("1");	num2 = new JLabel("2");
@@ -172,12 +173,17 @@ public class ChronotimerGUI extends JFrame {
 		
 		// South-center - text field for racing times
 		JPanel raceTimesPanel = new JPanel(new GridLayout(2, 1));
-		JTextArea raceTimesField = new JTextArea(10, 20);
-		raceTimesField.setEditable(false);
+		
+		JPanel  raceTimesField = new JPanel();
+		raceTimesField.setLayout(new BoxLayout(raceTimesField, BoxLayout.X_AXIS));
+		raceTextArea.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
+		raceTextArea.setEditable(false);
+		JScrollPane racePane = new JScrollPane(raceTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,  JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		racePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		raceTimesField.add(racePane);
 		
 		raceTimesPanel.add(raceTimesField, BorderLayout.CENTER);
 		raceTimesPanel.add(timerLabel, BorderLayout.SOUTH);
-		
 
 		
 		//add menuitems to function menu
@@ -323,7 +329,7 @@ public class ChronotimerGUI extends JFrame {
 		{
 			// POWER
 		 	if(event.getSource().equals(_power)) {
-		 		
+		 	/*
 		 			_ch1.setSelected(false);
 		 			_ch2.setSelected(false);
 		 			_ch3.setSelected(false);
@@ -342,7 +348,8 @@ public class ChronotimerGUI extends JFrame {
 		 			_chSeven.setSelected(false);
 		 			_chEight.setSelected(false);
 		 			_sensorBox.setSelectedIndex(0);
-		 			_c.COMMANDS("POWER");
+		 		*/	_c.COMMANDS("POWER");
+		 		
 		 			
 		 	}
 		 	
@@ -410,23 +417,23 @@ public class ChronotimerGUI extends JFrame {
 		{
 			//KEYPAD
 			
-			if(event.getSource().equals(_kp1)) printerTextArea.append("1");
-			if(event.getSource().equals(_kp2)) printerTextArea.append("2");
-			if(event.getSource().equals(_kp3)) printerTextArea.append("3");
-			if(event.getSource().equals(_kp4)) printerTextArea.append("4");
-			if(event.getSource().equals(_kp5)) printerTextArea.append("5");
-			if(event.getSource().equals(_kp6)) printerTextArea.append("6");
-			if(event.getSource().equals(_kp7)) printerTextArea.append("7");
-			if(event.getSource().equals(_kp8)) printerTextArea.append("8");
-			if(event.getSource().equals(_kp9)) printerTextArea.append("9");
-			if(event.getSource().equals(_kpS)) printerTextArea.append("*");
-			if(event.getSource().equals(_kp0)) printerTextArea.append("0");
-			
-			
+			if(event.getSource().equals(_kp1)) if(_c.getPower()) printerTextArea.append("1");
+			if(event.getSource().equals(_kp2)) if(_c.getPower())printerTextArea.append("2");
+			if(event.getSource().equals(_kp3)) if(_c.getPower())printerTextArea.append("3");
+			if(event.getSource().equals(_kp4)) if(_c.getPower())printerTextArea.append("4");
+			if(event.getSource().equals(_kp5)) if(_c.getPower())printerTextArea.append("5");
+			if(event.getSource().equals(_kp6)) if(_c.getPower())printerTextArea.append("6");
+			if(event.getSource().equals(_kp7)) if(_c.getPower())printerTextArea.append("7");
+			if(event.getSource().equals(_kp8)) if(_c.getPower())printerTextArea.append("8");
+			if(event.getSource().equals(_kp9)) if(_c.getPower())printerTextArea.append("9");
+			if(event.getSource().equals(_kpS)) if(_c.getPower())printerTextArea.append("*");
+			if(event.getSource().equals(_kp0)) if(_c.getPower())printerTextArea.append("0");
 			
 			if(event.getSource().equals(_kpP)) {
-				//create racer object and then add it to queue then clear text area
-				//check for numbers out of range [0,9999]
+				//if no run is currently active just return, nothing to do here
+				if(_c.getRun() == null){
+					return;
+				}
 				
 				//will use this for grp race feature as well
 				if(_c.getRun().getCurEvent().equals("GRP")) {
@@ -451,8 +458,6 @@ public class ChronotimerGUI extends JFrame {
 				}
 			}
 			
-			
-			//TODO
 		}
 		
 	}
@@ -470,6 +475,11 @@ public class ChronotimerGUI extends JFrame {
 			}
 			else if(event.getSource().equals(_num)) {
 				//Solution for grabbing just the last line of our printer text field for parsing bib numbers
+				
+				//if no run is currently active just return, nothing to do here
+				if(_c.getRun() == null){
+					return;
+				}
 				Document document = printerTextArea.getDocument();
 				Element rootElem = document.getDefaultRootElement();
 				int numLines = rootElem.getElementCount();
@@ -486,7 +496,8 @@ public class ChronotimerGUI extends JFrame {
 				}
 				lineText = lineText.trim();
 				printerTextArea.append("\n");
-			
+				
+			//careful of passing in garbage strings 
 				_c.COMMANDS("NUM " + lineText);
 			}
 			else if(event.getSource().equals(_DNF)) {

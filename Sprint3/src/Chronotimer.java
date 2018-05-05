@@ -111,7 +111,8 @@ public class Chronotimer {
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
-				_channels[i].toggleState();		
+				_channels[i].toggleState();
+				disc(_channels[i].getNum());	//disconnect any sensors found connected to respective channel
 			}
 		}
 		System.out.println(Time.toHMSString(Time.getTime()) + " System has been reset");
@@ -128,7 +129,10 @@ public class Chronotimer {
 		_finished.add(_racing.remove(_racing.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
 	}
 	private void CANCEL() {
-			
+		if(_curRun == null)	{
+			return;
+		}
+		
 		_curRacer.resetTime();		  //null and void all of current racer's times
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line" );
 		_printer.append("Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line"  + "\r\n");
@@ -251,6 +255,7 @@ public class Chronotimer {
 					_curRacer.DNF();
 					_finished.add(_curRacer);
 				}
+			
 			}
 			
 			System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
@@ -265,6 +270,7 @@ public class Chronotimer {
 			_racing.clear();			//clear all racers from active queue;
 			_tempFinished.clear();		//clear all racers from temp quueue;
 			_racingMap.clear();
+			_event = null;
 			
 			
 			
@@ -318,14 +324,14 @@ public class Chronotimer {
 	
 	//method only usable during IND event and swaps the next two racers to finish 
 	private void swap() {
-		if(_racing.size() >= 2 && _curRun.getCurEvent().equals("IND")) {	// need atleast two people racing in order to swap
+		if(_racing.size() >= 2 && (_curRun.getCurEvent().equals("IND") || _curRun.getCurEvent().equals("PARIND"))) {	// need atleast two people racing in order to swap
 			
 			//next two to finish for IND are swapped in the current racing queue
 			Racer temp = _racing.get(0);
 			_racing.set(0, _racing.get(1));
 			_racing.set(1, temp);	
 			System.out.println(Time.toHMSString(Time.getTime()) + " " + _racing.get(1).getName() + " and " + _racing.get(0).getName() + " have been swapped");
-			_printer.append(_racing.get(1) + " and " + _racing.get(0) + " have been swapped\n");
+			_printer.append(_racing.get(1).getName() + " and " + _racing.get(0).getName() + " have been swapped\n");
 		}
 		else {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Invalid conditions for Swap");
