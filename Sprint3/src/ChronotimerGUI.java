@@ -334,10 +334,13 @@ public class ChronotimerGUI extends JFrame {
 		 	if(event.getSource().equals(_power)) {
 		 	
 		 			printerTextArea.setText("");
+		 			raceTextArea.setText("");
 		 			_sensorBox.setSelectedIndex(0);
 		 			power = !power;
 		 			toggleEnable();
 		 			_c.COMMANDS("POWER");
+		 			runThread();
+		 			displayUpdater.start();
 		 			
 		 	}
 		 	
@@ -458,8 +461,7 @@ public class ChronotimerGUI extends JFrame {
 			
 			if(event.getSource().equals(_newRun)) {
 				_c.COMMANDS("NEWRUN");
-				runThread();
-	 			displayUpdater.start();
+				
 			}
 			else if(event.getSource().equals(_endRun)) {
 				_c.COMMANDS("ENDRUN");
@@ -545,6 +547,8 @@ public class ChronotimerGUI extends JFrame {
 				}
 				lineText = lineText.trim();
 				printerTextArea.append("\n");
+				
+				System.out.println(lineText);
 				
 				//be careful of passing in empty/garbage strings over to chronotimer
 				_c.COMMANDS("EXPORT " + lineText);

@@ -46,6 +46,7 @@ public class Chronotimer {
 		_racingMap = new HashMap<Integer,Racer>();
 		time = new Time();
 		_printer = printer;
+		_display = new RunningDisplay();
 	}
 	public Run getRun() {
 		return _curRun;
@@ -280,7 +281,7 @@ public class Chronotimer {
 			_curRun = null;				//deactivate run
 			_finished.clear();			//clear all racers from finished queue;
 			_racing.clear();			//clear all racers from active queue;
-			_tempFinished.clear();		//clear all racers from temp quueue;
+			_tempFinished.clear();		//clear all racers from temp queue;
 			_racingMap.clear();
 			_event = null;
 			
@@ -309,7 +310,10 @@ public class Chronotimer {
 			_printer.append("Nothing to export!\n");
 			return;
 		}
+		System.out.println(runNumber);
+		System.out.println(_storage.size());
 		for(int i = 0; i < _storage.size(); i++) {
+			System.out.println("i is " + i + " RunNum is: " +_storage.get(i).getRun().getRunNum() );
 			if(_storage.get(i).getRun().getRunNum() == runNumber){
 				try{    
 			           FileWriter file = new FileWriter("Run" + runNumber + ".txt");
@@ -323,14 +327,13 @@ public class Chronotimer {
 			          }catch(Exception e){
 			        	  System.out.println(e);
 			        	  _printer.append(e + "\n");
-			          }  
-			}
-			else {
-				System.out.println(Time.toHMSString(Time.getTime()) + " Could not find run number in storage!");
-				_printer.append("Could not find run number in storage!" + "\r\n");
+			          }
 				return;
-			}
+			}	
+			
 		}
+		System.out.println(Time.toHMSString(Time.getTime()) + " Could not find run number in storage!");
+		_printer.append("Could not find run number in storage!" + "\r\n");
 			
 	}
 	
