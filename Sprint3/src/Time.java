@@ -4,12 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 public class Time {
 	private static Date sysClock; //might need to use new call of date to get updated time 
-	private long startTime;
-	private long endTime;
 	
 	public Time() {
-		startTime = 0;
-		endTime = 0;
+		sysClock = null;
 	}
 	//convert formatted time into an array of longs holding h/m/s/ms
 	protected static long[] parseTime(String timeIn) {
@@ -81,10 +78,6 @@ public class Time {
 	}
 	
 	
-	public void start(String timeIn) {
-		long[] times = parseTime(timeIn);
-		startTime = toMills(times);
-	}
 	
 	public static long getTime() {
 		if (sysClock != null) {			// assigned sysClock time from reading time from files or commands
@@ -94,13 +87,7 @@ public class Time {
 	}
 	
 	
-	public void finish(String timeIn) {
-		long[] times = parseTime(timeIn);
-		endTime = toMills(times);
-	}
-	
 	public void setTime() {			//initialize time to null 
-		
 		sysClock = null;
 	}
 	//used for setting system time that is parsed in through given file or even input
@@ -108,22 +95,14 @@ public class Time {
 		long[] times = parseTime(timeIn);
 		sysClock = new Date(toMills(times));
 	}
-	public static String getTimeAsString() {
+	public String getTimeAsString() {
 		String ret = toHMSString(sysClock.getTime());
 		return ret;
 	}
-	//for flair
-	public String getStart() {
-		return toHMSString(this.startTime);
+	
+	public String getRacingTime(long time) {
+		return raceHMSString(time);
 	}
 	
-	//for flair
-	public String getFinish() {
-		return toHMSString(this.endTime);
-	}
 	
-	//get race time in string format
-	public String totalTime() {
-		return toHMSString(this.endTime - this.startTime);
-	}
 }

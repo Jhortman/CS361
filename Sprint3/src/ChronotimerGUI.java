@@ -80,8 +80,10 @@ public class ChronotimerGUI extends JFrame {
 	private JMenu	_functionMenu	= new JMenu("FUNCTION");
 	private static JTextArea printerTextArea = new JTextArea(5, 20);
 	private static JTextArea raceTextArea = new JTextArea(10, 20);
+	private boolean power = false;
+	private Thread displayUpdater;
 	
-	//pass in printerfield to chronotimer for printing events 
+	//pass in printerfield and raceTextArea to chronotimer for printing events 
 	private static Chronotimer _c = new Chronotimer(printerTextArea);
 	
 	public static void main(String[] args) {
@@ -107,6 +109,7 @@ public class ChronotimerGUI extends JFrame {
 		setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
+        toggleEnable();
 	}
 	
 	public void createDisplay(){
@@ -329,34 +332,20 @@ public class ChronotimerGUI extends JFrame {
 		{
 			// POWER
 		 	if(event.getSource().equals(_power)) {
-		 	/*
-		 			_ch1.setSelected(false);
-		 			_ch2.setSelected(false);
-		 			_ch3.setSelected(false);
-		 			_ch4.setSelected(false);
-		 			_ch5.setSelected(false);
-		 			_ch6.setSelected(false);
-		 			_ch7.setSelected(false);
-		 			_ch8.setSelected(false);
+		 	
 		 			printerTextArea.setText("");
-		 			_chOne.setSelected(false);
-		 			_chTwo.setSelected(false);
-		 			_chThree.setSelected(false);
-		 			_chFour.setSelected(false);
-		 			_chFive.setSelected(false);
-		 			_chSix.setSelected(false);
-		 			_chSeven.setSelected(false);
-		 			_chEight.setSelected(false);
 		 			_sensorBox.setSelectedIndex(0);
-		 		*/	_c.COMMANDS("POWER");
-		 		
+		 			power = !power;
+		 			toggleEnable();
+		 			_c.COMMANDS("POWER");
 		 			
 		 	}
 		 	
 		 	// START
-		 	else if(event.getSource().equals(_b1)) _c.COMMANDS("TRIG 1");
+		 	else if(event.getSource().equals(_b1)) _c.COMMANDS("TRIG 1"); 
 		 	else if(event.getSource().equals(_b3)) _c.COMMANDS("TRIG 3");
 		 	else if(event.getSource().equals(_b5)) _c.COMMANDS("TRIG 5");
+		 	
 		 	else if(event.getSource().equals(_b7)) _c.COMMANDS("TRIG 7");
 		 	
 		 	// FINISH
@@ -469,6 +458,8 @@ public class ChronotimerGUI extends JFrame {
 			
 			if(event.getSource().equals(_newRun)) {
 				_c.COMMANDS("NEWRUN");
+				runThread();
+	 			displayUpdater.start();
 			}
 			else if(event.getSource().equals(_endRun)) {
 				_c.COMMANDS("ENDRUN");
@@ -525,6 +516,9 @@ public class ChronotimerGUI extends JFrame {
 	 			_chSeven.setSelected(false);
 	 			_chEight.setSelected(false);
 	 			_sensorBox.setSelectedIndex(0);
+	 			
+	 		//	displayUpdater.interrupt();
+	 			
 				_c.COMMANDS("RESET");
 			}
 			else if(event.getSource().equals(_print)) {
@@ -567,5 +561,63 @@ public class ChronotimerGUI extends JFrame {
 			else {}
 		}
 	}
+	public void toggleEnable() {
+		if(power) {
+			_ch1.setEnabled(true);
+			_ch2.setEnabled(true);
+			_ch3.setEnabled(true);
+			_ch4.setEnabled(true);
+			_ch5.setEnabled(true);
+			_ch6.setEnabled(true);
+			_ch7.setEnabled(true);
+			_ch8.setEnabled(true);
+			_chOne.setEnabled(true);
+			_chTwo.setEnabled(true);
+			_chThree.setEnabled(true);
+			_chFour.setEnabled(true);
+			_chFive.setEnabled(true);
+			_chSix.setEnabled(true);
+			_chSeven.setEnabled(true);
+			_chEight.setEnabled(true);
+		}
+		else {
+			_ch1.setEnabled(false);
+			_ch2.setEnabled(false);
+			_ch3.setEnabled(false);
+			_ch4.setEnabled(false);
+			_ch5.setEnabled(false);
+			_ch6.setEnabled(false);
+			_ch7.setEnabled(false);
+			_ch8.setEnabled(false);
+			_chOne.setEnabled(false);
+			_chTwo.setEnabled(false);
+			_chThree.setEnabled(false);
+			_chFour.setEnabled(false);
+			_chFive.setEnabled(false);
+			_chSix.setEnabled(false);
+			_chSeven.setEnabled(false);
+			_chEight.setEnabled(false);
+		}
+	}
+	private void updateRunningDisplay(){
+		raceTextArea.setText(_c.displayWaiting() + "\n\n" + _c.displayRacing() + "\n\n" +  _c.displayFinished());
+	}
+	
+	private void runThread() {
+		displayUpdater = new Thread() {
+			public void run() {
+				while(power) {
+					updateRunningDisplay();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						//do nothing
+					}
+				}
+				
+			}
+		};
+	}
+	
 	
 }

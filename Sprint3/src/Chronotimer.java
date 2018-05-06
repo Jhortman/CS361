@@ -1,5 +1,6 @@
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import javax.swing.JTextArea;
 
@@ -28,6 +29,8 @@ public class Chronotimer {
 	private Time time;
 	private static int _runNum = 0;
 	private JTextArea _printer;
+	private RunningDisplay _display;
+	
 
 	public Chronotimer(JTextArea printer) {
 		// initializing all of the timer 
@@ -50,7 +53,9 @@ public class Chronotimer {
 	public boolean getPower() {
 		return power;
 	}
-	
+	public Time getTime(){
+		return time;
+	}
 	public void COMMANDS(String action) {
 		
 		String[] tokens;
@@ -236,6 +241,7 @@ public class Chronotimer {
 	private void newRun() {	
 		if(_curRun == null) {
 			_curRun = new Run(_event, ++_runNum);
+			_display = new RunningDisplay();
 			System.out.println(Time.toHMSString(Time.getTime()) + " Current event " + _curRun.getCurEvent() + " is running");
 			_printer.append("Current event " + _curRun.getCurEvent() + " is running\r\n");
 		}
@@ -514,7 +520,175 @@ public class Chronotimer {
 		}
 	
 	}
+	//sticking class here since its easier to grab what I need from the chronotimer
+	//surrounded everything in try/catch since it will be throwing many errors upon trying to check for potential changes in updates to be made for the display
+	protected class RunningDisplay
+	{
+		private String _waiting;
+		private String racing;
+		private String finished;
+		
+		private void display()
+		{
+			switch(_curRun.getCurEvent())
+			{
+			case "IND":
+			{
+				try{
+					_waiting = "";
+					if(!_curRun.getRacers().isEmpty()) {
+						_waiting += _curRun.getRacers().get(0).getName() + "  >\n";
+						for(int i = 1; i < _curRun.getRacers().size(); i++)
+							if(i < 3) {
+								_waiting += _curRun.getRacers().get(i).getName() + "\n";
+							}
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{ 
+					racing = "";
+					if(!_racing.isEmpty()) {
+						racing += _racing.get(_racing.size() -1 ).getName() + "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(_racing.size() -1).getStartAsLong()) + "\n";
+						if(_racing.size() > 1){
+							for(int i = _racing.size() - 2; i >= 0; i--) {
+								racing += _racing.get(i).getName() +  "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(i).getStartAsLong()) + "\n";
+							}
+						}
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{
+					finished = "";
+					if(!_finished.isEmpty()) {
+						finished += _finished.getLast().getName() + "  " + _finished.getLast().getRaceTime();
+					}
+				}catch(NoSuchElementException e) {}
+				break;
+			}
+			case "PARIND":
+			{
+				try{
+					_waiting = "";
+					if(!_curRun.getRacers().isEmpty()) {
+						_waiting += _curRun.getRacers().get(0).getName() + " >\n";
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{
+					
+					if(_curRun.getRacers().size() > 1) {
+						_waiting += _curRun.getRacers().get(1).getName() + "\n";
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{
+					racing = "";
+					if(!_racing.isEmpty()) {
+						racing += _racing.get(_racing.size() -1 ).getName() + "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(_racing.size() -1).getStartAsLong()) + "\n";
+						if(_racing.size() > 1){
+							for(int i = _racing.size() - 2; i >= 0; i--) {
+								racing += _racing.get(i).getName() +  "   " + time.getRacingTime(System.currentTimeMillis() - _racing.get(i).getStartAsLong()) + "\n";
+							}
+						}
+					}
+				}catch(Exception e) {}
+				
+				try{
+					finished= "";
+					if(_finished.size() == 1) {
+						finished += _finished.get(_finished.size()-1).getName() + "  " + _finished.get(_finished.size()-1).getRaceTime() + "\n";
+					}
+					if (_finished.size() > 1){
+						finished += _finished.get(_finished.size()-2).getName() + "  " + _finished.get(_finished.size()-2).getRaceTime() + "\n";
+						finished += _finished.get(_finished.size()-1).getName() + "  " + _finished.get(_finished.size()-1).getRaceTime() + "\n";
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{
+					if(!_finished.isEmpty()) {
+						finished += _finished.get(_finished.size()).getName() + " " + _finished.get(_finished.size()-1).getRaceTime();
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				break;
+			}
+			case "GRP":
+			{
+				_waiting = "";		//dont care about people waiting
+				try{
+					racing = "";
+					if(!_racing.isEmpty()) {
+						racing += _racing.get(_racing.size() -1 ).getName() + "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(_racing.size() -1).getStartAsLong()) + "\n";
+						if(_racing.size() > 1){
+							for(int i = _racing.size() - 2; i >= 0; i--) {
+								racing += _racing.get(i).getName() +  "   " + time.getRacingTime(System.currentTimeMillis() - _racing.get(i).getStartAsLong()) + "\n";
+							}
+						}
+					}
+				}catch(IndexOutOfBoundsException e) {}
+				
+				try{
+					finished = "";
+					if(!_finished.isEmpty()) {
+						finished += _finished.getLast().getName() + "  " + _finished.getLast().getRaceTime() + "\n";
+					}
+				}catch(NoSuchElementException e) {}
+			}
+			case "PARGRP":
+			{
+				_waiting = "";
+				try{
+					racing = "";
+					if(!_racing.isEmpty()) {
+						racing += _racing.get(_racing.size() -1 ).getName() + "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(_racing.size() -1).getStartAsLong()) + "\n";
+						if(_racing.size() > 1){
+							for(int i = _racing.size() - 2; i >= 0; i--) {
+								racing += _racing.get(i).getName() +  "   " + time.getRacingTime(System.currentTimeMillis() - _racing.get(i).getStartAsLong()) + "\n";
+							}
+						}
+					}
+				}catch(NoSuchElementException e) {}
+				
+				try{
+					finished = "";
+					if(!_finished.isEmpty()) {
+						finished += "In Lane: " + _finished.getLast().getName() + " " +  _finished.getLast().getRaceTime() + "\n";
+					}
+				}catch(NoSuchElementException e) {}
+				break;
+			}
+			default:break;
+			}
+		}
+		private String getWaiting() {return _waiting;}
+		private String getRacing() {return racing;}
+		private String getFinished() {return finished;}
+	}
 	
-	
+	public String displayWaiting(){
+		_display.display();
+		return _display.getWaiting();
+	}
+	public String displayRacing(){
+		_display.display();
+		return _display.getRacing();
+	}
+	public String displayFinished(){
+		_display.display();
+		return _display.getFinished();
+	}
+	/*
+	 public int getKey(String bibNum){
+		    for(int i = 1; i < 9; i++){
+		    	if(_racingMap.get(i).getName().equals(bibNum)){
+		    		return i;
+		 
+		    	}
+		    	else{
+		    		return -1;
+		    	}
+		    }
+		    
+		  }
+*/
 
 }
