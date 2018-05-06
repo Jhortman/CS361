@@ -526,9 +526,12 @@ public class ChronotimerGUI extends JFrame {
 			}
 			else if(event.getSource().equals(_export)) {
 				//Exact same method for adding bib nums, in this case we just run number that we want to export to file 
+				
+				
 				Document document = printerTextArea.getDocument();
 				Element rootElem = document.getDefaultRootElement();
 				int numLines = rootElem.getElementCount();
+				
 				Element lineElem = rootElem.getElement(numLines - 1);
 				int lineStart = lineElem.getStartOffset();
 				int lineEnd = lineElem.getEndOffset();
