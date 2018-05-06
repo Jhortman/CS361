@@ -72,7 +72,7 @@ public class Time {
 		//if hours | minutes | seconds are equal to zero
 		if (hours == 0){} else if (hours < 10) { ret += "0" + hours + ":"; } else ret += hours + ":";
 		if (minutes == 0){} else if (minutes < 10){ ret += "0" + minutes + ":"; } else ret += minutes + ":";
-		if (seconds == 0){} else if (seconds < 10){ ret += "0" + seconds; } else ret += seconds;
+		if (seconds < 10) ret += "0" + seconds; else ret += seconds;
 		ret += "." + hSeconds;
 		return ret;
 	}
