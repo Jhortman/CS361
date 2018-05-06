@@ -526,16 +526,23 @@ public class Chronotimer {
 		}
 	
 	}
-	//sticking class here since its easier to grab what I need from the chronotimer
+	//sticking class here since its easier to grab what we need from the chronotimer
 	//surrounded everything in try/catch since it will be throwing many errors upon trying to check for potential changes in updates to be made for the display
+	//class to build string for runningDisplay that will be used to constantly rewrite textField in the gui to keep an updated display of racers racing
+	//Using a thread in gui that calls this method every 100 milliseconds to rewrite runningDisplay textfield in gui
 	protected class RunningDisplay
 	{
 		protected String _waiting;
 		protected String racing;
 		protected String finished;
 		
-		protected void display()
-		{
+		protected void display() {
+		
+		if(_curRun == null){
+			_waiting = ""; racing = ""; finished = "";
+			return;					//nothing to build here if run is null;
+		}
+	
 			switch(_curRun.getCurEvent())
 			{
 			case "IND":
@@ -642,7 +649,7 @@ public class Chronotimer {
 				try{
 					finished = "";
 					if(!_finished.isEmpty()) {
-						finished += _finished.getLast().getName() + "  " + _finished.getLast().getRaceTime() + "\n";
+						finished += _finished.getLast().getName() + "  " + _finished.getLast().getRaceTime() + "  in place: " + _finished.size() + "\n";
 					}
 				}catch(NoSuchElementException e) {}
 				break;
@@ -684,6 +691,7 @@ public class Chronotimer {
 		protected String getFinished() {return finished;}
 	}
 	
+	//methods to refresh our string and return updated info over to gui
 	public String displayWaiting(){
 		_display.display();
 		return _display.getWaiting();
