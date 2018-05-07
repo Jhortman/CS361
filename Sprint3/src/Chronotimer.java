@@ -146,6 +146,7 @@ public class Chronotimer {
 		}
 		
 		_curRacer.resetTime();		  //null and void all of current racer's times
+		_racing.removeFirst();  	  //next to finish in race is removed and added back to next to start
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line" );
 		_printer.append("Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line"  + "\r\n");
 		_curRun.pushRacer(_curRacer); //push racer to start of queue
@@ -310,10 +311,7 @@ public class Chronotimer {
 			_printer.append("Nothing to export!\n");
 			return;
 		}
-		System.out.println(runNumber);
-		System.out.println(_storage.size());
 		for(int i = 0; i < _storage.size(); i++) {
-			System.out.println("i is " + i + " RunNum is: " +_storage.get(i).getRun().getRunNum() );
 			if(_storage.get(i).getRun().getRunNum() == runNumber){
 				try{    
 			           FileWriter file = new FileWriter("Run" + runNumber + ".txt");
