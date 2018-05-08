@@ -548,8 +548,6 @@ public class ChronotimerGUI extends JFrame {
 				lineText = lineText.trim();
 				printerTextArea.append("\n");
 				
-				System.out.println(lineText);
-				
 				//be careful of passing in empty/garbage strings over to chronotimer
 				_c.COMMANDS("EXPORT " + lineText);
 			}
@@ -624,6 +622,10 @@ public class ChronotimerGUI extends JFrame {
 				
 			}
 		};
+	}
+	
+	protected JTextArea getPrinterTextArea() {
+		return printerTextArea;
 	}
 	
 	

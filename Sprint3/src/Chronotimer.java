@@ -16,22 +16,22 @@ import java.net.URL;
 import com.google.gson.Gson;
 
 public class Chronotimer {
-	protected Channel[] _channels;
-	protected Racer _curRacer;
-	protected String _event;
-	protected Run _curRun;
-	protected ArrayList<Storage> _storage;
-	protected LinkedList<Racer> _racing;
-	protected LinkedList<Racer> _finished;
-	protected LinkedList<Racer> _tempFinished;
-	protected HashMap<Integer, Racer> _racingMap;
-	protected boolean power;
-	protected Time time;
-	protected static int _runNum = 0;
-	protected JTextArea _printer;
-	protected RunningDisplay _display;
+	private Channel[] _channels;
+	private Racer _curRacer;
+	private String _event;
+	private Run _curRun;
+	private ArrayList<Storage> _storage;
+	private LinkedList<Racer> _racing;
+	private LinkedList<Racer> _finished;
+	private LinkedList<Racer> _tempFinished;
+	private HashMap<Integer, Racer> _racingMap;
+	private boolean power;
+	private Time time;
+	private static int _runNum = 0;
+	private JTextArea _printer;
+	private RunningDisplay _display;
 	
-
+	
 	public Chronotimer(JTextArea printer) {
 		// initializing all of the timer 
 		_channels = new Channel[8];
@@ -62,6 +62,21 @@ public class Chronotimer {
 		return _curRacer;
 	}
 	
+	public LinkedList<Racer> getRacing(){
+		return _racing;
+	}
+	public LinkedList<Racer> getFinished(){
+		return _finished;
+	}
+	public String getEvent() {
+		return _event;
+	}
+	public Channel[] getChannels() {
+		return _channels;
+	}
+	public HashMap<Integer,Racer> getRaceMap(){
+		return _racingMap;
+	}
 	public void COMMANDS(String action) {
 		
 		String[] tokens;
@@ -75,7 +90,7 @@ public class Chronotimer {
 			case "EXIT"		: EXIT();break;
 			case "RESET"	: RESET();break;
 			case "TIME"		: TIME(tokens[1]);break;
-			case "EVENT"	: _event = tokens[1]; System.out.println(Time.toHMSString(Time.getTime()) + " " + "event is " + _event ); _printer.append("event is " + _event + "\r\n" ); break;
+			case "EVENT"	: _event = tokens[1]; if(_curRun == null) {System.out.println(Time.toHMSString(Time.getTime()) + " " + "Event is " + _event ); _printer.append("Event is " + _event + "\r\n" );} break;
 			case "DNF"		: if(_curRun != null) DNF();break;
 			case "CANCEL"	: CANCEL();break;
 			case "TOG"		: TOG(Integer.parseInt(tokens[1]) - 1);break; // channels stored 0-7, input given 1-8 -> decrement by 1 for right offset
@@ -95,7 +110,7 @@ public class Chronotimer {
 			 
 		}
 	}
-	protected void POWER() { 
+	private void POWER() { 
 		if(!power) {		// if power is off turn it on and disarm all channels
 			power = true;
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power On");
@@ -108,10 +123,10 @@ public class Chronotimer {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Power Off");
 		}
 	}
-	protected void EXIT() {
+	private void EXIT() {
 		System.exit(0);
 	}
-	protected void RESET() {
+	private void RESET() {
 		_curRun = null;							//reset run
 		time.setTime();							//set time to current time in system
 		_event = null;							// reset event
@@ -122,39 +137,41 @@ public class Chronotimer {
 		_storage.clear();   					//clear out storage
 		for(int i = 0; i < 8; i++) {			// disarm all channels if active
 			if(_channels[i].getState()) {
-				_channels[i].toggleState();
-				disc(_channels[i].getNum());	//disconnect any sensors found connected to respective channel
+				_channels[i].toggleState();	
 			}
+			disc(i);	//disconnect any sensors found connected to respective channel
 		}
 		System.out.println(Time.toHMSString(Time.getTime()) + " System has been reset");
 		_printer.append("System has been reset\n");
 	
 	}
-	protected void TIME(String s) {
+	private void TIME(String s) {
 		Time.setTime(s);		//set system time to the inputed time in string format
 	}
-	protected void DNF() {		//current racer in race receives DNF
+	private void DNF() {		//current racer in race receives DNF
 		_curRacer = _racing.get(0);
 		_curRacer.DNF();
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!");
 		_printer.append("Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
 		_finished.add(_racing.remove(_racing.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
 	}
-	protected void CANCEL() {
+	private void CANCEL() {
 		if(_curRun == null)	{
 			return;
 		}
 		
-		_curRacer.resetTime();		  //null and void all of current racer's times
-		_racing.removeFirst();  	  //next to finish in race is removed and added back to next to start
+		if(!_racing.isEmpty()) {
+			_curRacer = _racing.removeFirst();  	  //next to finish in race is removed and added back to next to start
+			_curRacer.resetTime();
+			_curRun.pushRacer(_curRacer); //push racer to start of queue
+		}
 		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line" );
 		_printer.append("Racer " + _curRacer.getName() + "'s time has been discarded and was moved to start of the line"  + "\r\n");
-		_curRun.pushRacer(_curRacer); //push racer to start of queue
 		
 	}
 	
 	//if channel is active -> disarm and vice versa
-	protected void TOG(int i) {
+	private void TOG(int i) {
 		_channels[i].toggleState();
 		if(_channels[i].getState()) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is active.");
@@ -168,7 +185,7 @@ public class Chronotimer {
 	
 	//NEED to simplify compound conditionals here 
 	//only triggers if event is going on
-	protected void TRIG(int i) {
+	private void TRIG(int i) {
 		
 		if(_curRun == null) {			//if no run active / nothing to do / just return
 			return;
@@ -179,6 +196,29 @@ public class Chronotimer {
 			
 			if(_curRun.getCurEvent().toUpperCase().equals("GRP") && _channels[i].getNum() == 1){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
 				startGRP();	
+			}
+			else if((_curRun.getCurEvent().toUpperCase().equals("IND") || _curRun.getCurEvent().toUpperCase().equals("PARIND")) && _channels[i].getNum() == 1) {
+				_curRacer = _curRun.popRacer(); //pop racer from start queue 
+				_curRacer.start();
+				_racing.add(_curRacer); // add racer to racers: currently racing queue
+				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+			}
+			else if(_curRun.getCurEvent().toUpperCase().equals("PARIND") && _channels[i].getNum() == 3) {
+				if(_curRun.getRacers().size() > 1) {
+					_curRacer = _curRun.getRacers().remove(1); //remove racer who is 2nd to start  
+					_curRacer.start();
+					_racing.add(_curRacer); // add racer to racers: currently racing queue
+					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+				}
+				else {
+					_curRacer = _curRun.popRacer(); //remove racer who is 2nd to start  
+					_curRacer.start();
+					_racing.add(_curRacer); // add racer to racers: currently racing queue
+					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
+					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
+				}
 			}
 			else if (_curRun.getCurEvent().toUpperCase().equals("PARGRP") && _channels[i].getNum() == 1) {
 				if(!_racing.isEmpty()) {
@@ -193,33 +233,44 @@ public class Chronotimer {
 			else if(_curRun.getCurEvent().toUpperCase().equals("PARGRP") && _channels[i].getNum() != 1) {
 				trigFinishParGrp(_channels[i].getNum());
 			}
-			else{
-				_curRacer = _curRun.popRacer(); //pop racer from start queue 
-				_curRacer.start();
-				_racing.add(_curRacer); // add racer to racers: currently racing queue
-				System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
-			}
 			
 		}
 		//allows finish triggers to occur only if there is an active run/ active racer / channel is on / and even parity
 		if(!_racing.isEmpty() && _channels[i].getState() && ((_channels[i].getNum() % 2) == 0)){// trigger finish only if channel is on and parity is even 
-			if(_curRun.getCurEvent().toUpperCase().equals("GRP")){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
+			if(_curRun.getCurEvent().toUpperCase().equals("GRP") && _channels[i].getNum() == 2){ //if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
 				finishGRP();
 			}
 			else if(_curRun.getCurEvent().toUpperCase().equals("PARGRP")) {
 				trigFinishParGrp(_channels[i].getNum());
 			}
-			else {
-			_curRacer = _racing.removeFirst(); // first in first to finish 
-			_curRacer.finish();
-			_finished.add(_curRacer);  // add racer to finished queue
-			System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
-			_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
+			else if((_curRun.getCurEvent().toUpperCase().equals("IND") || _curRun.getCurEvent().toUpperCase().equals("PARIND")) && _channels[i].getNum() == 2) {
+				_curRacer = _racing.removeFirst(); // first in first to finish 
+				_curRacer.finish();
+				_finished.add(_curRacer);  // add racer to finished queue
+				System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
+				_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
 			}
+			else if(_curRun.getCurEvent().toUpperCase().equals("PARIND") && _channels[i].getNum() == 4) {
+				if(_racing.size() > 1) {
+					_curRacer = _racing.remove(1); // remove 2nd to finish 
+					_curRacer.finish();
+					_finished.add(_curRacer);  // add racer to finished queue
+					System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
+					_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
+				}
+				else {
+					_curRacer = _racing.removeFirst(); // remove 2nd to finish 
+					_curRacer.finish();
+					_finished.add(_curRacer);  // add racer to finished queue
+					System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
+					_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
+				}
+			}
+				
 		}
-		//else do nothing
 	}
+		//else do nothing
+	
 	//NEED to simplify compound conditionals here 
 	public void START() {   // same as triggering start on channel 1
 		
@@ -233,7 +284,7 @@ public class Chronotimer {
 
 	}
 	//NEED to simplify compound conditionals here 
-	protected void FINISH() {  // same as triggering finish on channel 2
+	private void FINISH() {  // same as triggering finish on channel 2
 		
 		if(_curRun!= null && !_racing.isEmpty() && _channels[0].getState()) {
 			_curRacer = _racing.removeFirst(); // first in first to finish 
@@ -246,17 +297,21 @@ public class Chronotimer {
 	
 	
 	//start new Run only if there currently isn't one running
-	protected void newRun() {	
+	private void newRun() {	
 		if(_curRun == null) {
 			_curRun = new Run(_event, ++_runNum);
 			_display = new RunningDisplay();
 			System.out.println(Time.toHMSString(Time.getTime()) + " Current event " + _curRun.getCurEvent() + " is running");
 			_printer.append("Current event " + _curRun.getCurEvent() + " is running\r\n");
 		}
+		else {
+			System.out.println(Time.toHMSString(Time.getTime()) + " Must end current event " + _curRun.getCurEvent() + " before starting a new run");
+			_printer.append("Must end current event " + _curRun.getCurEvent() + " before starting a new run\r\n");
+		}
 	}
 	
 	//terminate current run
-	protected void endRun() {
+	private void endRun() {
 		if(_curRun == null) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " no run currently active");
 			_printer.append("no run currently active\r\n");
@@ -291,7 +346,7 @@ public class Chronotimer {
 		}
 	}
 	//prints current run of racer
-	protected void Print() {
+	private void Print() {
 		if(_finished.size() == 0) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " No times to report");
 			_printer.append("No times to report" + "\r\n");
@@ -304,7 +359,7 @@ public class Chronotimer {
 		}
 	}
 	//try to write run to file in standard JSON format.
-	protected void Export(int runNumber) {
+	private void Export(int runNumber) {
 		String out = "";
 		if(_storage.isEmpty()) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " Nothing to export!" );
@@ -336,8 +391,8 @@ public class Chronotimer {
 	}
 	
 	//method only usable during IND event and swaps the next two racers to finish 
-	protected void swap() {
-		if(_racing.size() >= 2 && (_curRun.getCurEvent().equals("IND") || _curRun.getCurEvent().equals("PARIND"))) {	// need atleast two people racing in order to swap
+	private void swap() {
+		if(_racing.size() >= 2 && (_curRun.getCurEvent().equals("IND"))) {	// need atleast two people racing in order to swap
 			
 			//next two to finish for IND are swapped in the current racing queue
 			Racer temp = _racing.get(0);
@@ -353,7 +408,7 @@ public class Chronotimer {
 	}
 	
 	//try to set sensortype to channel from given sensor/channel
-	protected void conn(String s, int i) {
+	private void conn(String s, int i) {
 		try {
 			if (s.toUpperCase().equals("EYE")  || 
 				s.toUpperCase().equals("GATE") ||
@@ -374,7 +429,7 @@ public class Chronotimer {
 		}
 	}
 	//try to disconnect sensor from given channel --> set sensor type to NONE
-	protected void disc(int i) {
+	private void disc(int i) {
 		try {
 			if(!_channels[i].getSensor().equals("NONE")) {
 				System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getSensor() + " Sensor has been disconected from " + _channels[i].getNum());
@@ -389,7 +444,7 @@ public class Chronotimer {
 	
 	//if event is GRP event then dequeue all racers in waiting queue upon triggering channel 1 (all racers have same start)
 	//method written to reduce clutter in trig method
-	protected void startGRP() {
+	private void startGRP() {
 		int qsize = _curRun.getRacers().size();
 		for(int j = 0; j < qsize; j++){			//iterate through queue popping all racers
 			
@@ -411,7 +466,7 @@ public class Chronotimer {
 	}
 	
 	//shoves current racers into a temporary queue in which they are to be sorted later with their proper finish times
-	protected void finishGRP() {
+	private void finishGRP() {
 		
 		_curRacer = _racing.removeFirst(); // first in first to finish 
 		_curRacer.finish();
@@ -458,7 +513,7 @@ public class Chronotimer {
 		
 		
 	}
-	protected void trigFinishParGrp(int i) {
+	private void trigFinishParGrp(int i) {
 		if(_racingMap.isEmpty()) {
 			return;
 		}
@@ -482,7 +537,7 @@ public class Chronotimer {
 			
 	}
 	
-	protected void sendPost(String JSON) {
+	private void sendPost(String JSON) {
 		try {
 			System.out.println("in the client");
 
@@ -531,13 +586,13 @@ public class Chronotimer {
 	//surrounded everything in try/catch since it will be throwing many errors upon trying to check for potential changes in updates to be made for the display
 	//class to build string for runningDisplay that will be used to constantly rewrite textField in the gui to keep an updated display of racers racing
 	//Using a thread in gui that calls this method every 100 milliseconds to rewrite runningDisplay textfield in gui
-	protected class RunningDisplay
+	private class RunningDisplay
 	{
-		protected String _waiting;
-		protected String racing;
-		protected String finished;
+		private String _waiting;
+		private String racing;
+		private String finished;
 		
-		protected void display() {
+		private void display() {
 		
 		if(_curRun == null){
 			_waiting = ""; racing = ""; finished = "";
@@ -687,9 +742,9 @@ public class Chronotimer {
 			default:break;
 			}
 		}
-		protected String getWaiting() {return _waiting;}
-		protected String getRacing() {return racing;}
-		protected String getFinished() {return finished;}
+		private String getWaiting() {return _waiting;}
+		private String getRacing() {return racing;}
+		private String getFinished() {return finished;}
 	}
 	
 	//methods to refresh our string and return updated info over to gui
