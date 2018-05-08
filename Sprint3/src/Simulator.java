@@ -30,7 +30,7 @@ public class Simulator extends Time{
 			
 			
 			while(!input.equalsIgnoreCase("EXIT")) {
-					//System.out.println("Enter Command");
+					System.out.print("Enter Command: ");
 					input = stdIn.nextLine();
 					ct.COMMANDS(input);
 				} 

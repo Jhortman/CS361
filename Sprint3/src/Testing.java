@@ -81,6 +81,15 @@ public class Testing {
 		ct.COMMANDS("TRIG 2");
 		ct.COMMANDS("DNF");
 		ct.COMMANDS("TRIG 2");
+		ct.inputGrpFinish("85");		
+		assertEquals("85", ct.getRacing().get(0).getRaceTime());
+		ct.inputGrpFinish("165");						//not in race wont do anything
+		ct.inputGrpFinish("16");
+		ct.inputGrpFinish("300");
+		ct.inputGrpFinish("85");
+		ct.inputGrpFinish("5");
+		ct.inputGrpFinish("91");
+		ct.inputGrpFinish("16");
 		ct.COMMANDS("ENDRUN");
 	}
 	
@@ -297,9 +306,13 @@ public class Testing {
 	public void testSwap() {
 		System.out.println("       -- TEST SWAP --       ");
 		ct.COMMANDS("POWER");
+		ct.COMMANDS("SWAP");				//can't swap with no run active
+		ct.COMMANDS("EVENT IND");
 		ct.COMMANDS("NEWRUN");
+		ct.COMMANDS("SWAP");				//can't swap with no runners
 		ct.COMMANDS("NUM 123");
 		ct.COMMANDS("NUM 234");
+		ct.COMMANDS("SWAP");				//can't swap with no runners racing
 		ct.COMMANDS("TOG 1");
 		ct.COMMANDS("TOG 2");
 		ct.COMMANDS("TRIG 1");
@@ -312,6 +325,20 @@ public class Testing {
 		ct.COMMANDS("TRIG 2");
 		ct.COMMANDS("TRIG 2");
 		ct.COMMANDS("PRINT");
+		ct.COMMANDS("ENDRUN");				//can't swap with no runners racing
+		ct.COMMANDS("EVENT PARIND");
+		ct.COMMANDS("NEWRUN");
+		ct.COMMANDS("NUM 123");
+		ct.COMMANDS("NUM 234");
+		ct.COMMANDS("TRIG 1");
+		ct.COMMANDS("TRIG 1");
+		ct.COMMANDS("SWAP");											//can't swap in any other race other than IND
+		assertEquals("123",ct.getRacing().get(0).getName());			//first to finish is still currently 123
+		assertEquals("234",ct.getRacing().get(1).getName());
+		ct.COMMANDS("PRINT");
+		ct.COMMANDS("ENDRUN");				//can't swap with no runners racing
+		
+		
 		
 	}
 	@Test
@@ -369,9 +396,28 @@ public class Testing {
 	
 		
 	}
-	
+	// test adding 1000 racers to queue
 	@Test
 	public void testAddingMany(){
+		ct.COMMANDS("POWER");
+		ct.COMMANDS("NEWRUN");
+		String num = "";
+		for(int i = 0;i < 1000; i++){
+			num +=i ;
+			ct.COMMANDS("NUM " + num);
+			assertEquals(num ,ct.getRun().getRacers().get(i).getName());
+		}
+		ct.COMMANDS("TOG 1");
+		ct.COMMANDS("TOG 2");
+		for(int i = 0;i < 1000; i++){
+			ct.COMMANDS("TRIG 1");
+			assertEquals(ct ,ct.getRun().getRacers().get(i).getName());
+		}
+		for(int i = 0;i < 1000; i++){
+			ct.COMMANDS("TRIG 1");
+			assertEquals(ct ,ct.getRun().getRacers().get(i).getName());
+		}
+		
 		
 	}
 	
