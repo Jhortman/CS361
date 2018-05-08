@@ -1,16 +1,21 @@
 import java.util.Scanner;
 
+import javax.swing.JTextArea;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
-public class Simulator extends Time {
+public class Simulator extends Time{
 
-	
+	public static void main(String[] args){
+		Chronotimer ct = new Chronotimer(new JTextArea());
+		simulate(ct);
+	}
 	// Keyboard input method
-	public void simulate(Chronotimer ct){
-		//Chronotimer ct = new Chronotimer();
+	public static void simulate(Chronotimer ct){
+		
 		String input = "";
 		String time;
 		 
@@ -19,7 +24,7 @@ public class Simulator extends Time {
 		//I went ahead and appended system time stamps for most of the actions that occur in the chronoTimer
 		// just for added clarity. The notable ones I excluded are power and exit. 
 		
-		System.out.print("Press Power or give <fileName>.txt: ");
+		System.out.print("Press Enter or give <fileName>.txt: ");
 		input = stdIn.nextLine();
 		if (!input.contains(".txt")) {						//if no file tag then give commands manually
 			
@@ -64,7 +69,7 @@ public class Simulator extends Time {
 	
 	
 	
-	/*public void readFile(String fileIn, Chronotimer ct) {
+	public void readFile(String fileIn, Chronotimer ct) {
 		
 		String input = "";
 		String time;
@@ -92,7 +97,7 @@ public class Simulator extends Time {
 		}
 		
 	}
-	*/
+	
 	
 }
 		
