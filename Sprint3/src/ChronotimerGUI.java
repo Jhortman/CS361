@@ -11,80 +11,80 @@ import java.awt.event.KeyEvent;
 public class ChronotimerGUI extends JFrame {
 	
 	// Initialize the buttons
-	private JRadioButton _ch1 = new JRadioButton();
-	private JRadioButton _ch2 = new JRadioButton();
-	private JRadioButton _ch3 = new JRadioButton();
-	private JRadioButton _ch4 = new JRadioButton();
-	private JRadioButton _ch5 = new JRadioButton();
-	private JRadioButton _ch6 = new JRadioButton();
-	private JRadioButton _ch7 = new JRadioButton();
-	private JRadioButton _ch8 = new JRadioButton();
-	private JButton _b1 = new JButton("");
-	private JButton _b2 = new JButton("");
-	private JButton _b3 = new JButton("");
-	private JButton _b4 = new JButton("");
-	private JButton _b5 = new JButton("");
-	private JButton _b6 = new JButton("");
-	private JButton _b7 = new JButton("");
-	private JButton _b8 = new JButton("");
-	private JButton _kp1 = new JButton("1");
-	private JButton _kp2 = new JButton("2");
-	private JButton _kp3 = new JButton("3");
-	private JButton _kp4 = new JButton("4");
-	private JButton _kp5 = new JButton("5");
-	private JButton _kp6 = new JButton("6");
-	private JButton _kp7 = new JButton("7");
-	private JButton _kp8 = new JButton("8");
-	private JButton _kp9 = new JButton("9");
-	private JButton _kp0 = new JButton("0");
-	private JButton _kpS = new JButton("*");
-	private JButton _kpP = new JButton("#");
+	protected JRadioButton _ch1 = new JRadioButton();
+	protected JRadioButton _ch2 = new JRadioButton();
+	protected JRadioButton _ch3 = new JRadioButton();
+	protected JRadioButton _ch4 = new JRadioButton();
+	protected JRadioButton _ch5 = new JRadioButton();
+	protected JRadioButton _ch6 = new JRadioButton();
+	protected JRadioButton _ch7 = new JRadioButton();
+	protected JRadioButton _ch8 = new JRadioButton();
+	protected JButton _b1 = new JButton("");
+	protected JButton _b2 = new JButton("");
+	protected JButton _b3 = new JButton("");
+	protected JButton _b4 = new JButton("");
+	protected JButton _b5 = new JButton("");
+	protected JButton _b6 = new JButton("");
+	protected JButton _b7 = new JButton("");
+	protected JButton _b8 = new JButton("");
+	protected JButton _kp1 = new JButton("1");
+	protected JButton _kp2 = new JButton("2");
+	protected JButton _kp3 = new JButton("3");
+	protected JButton _kp4 = new JButton("4");
+	protected JButton _kp5 = new JButton("5");
+	protected JButton _kp6 = new JButton("6");
+	protected JButton _kp7 = new JButton("7");
+	protected JButton _kp8 = new JButton("8");
+	protected JButton _kp9 = new JButton("9");
+	protected JButton _kp0 = new JButton("0");
+	protected JButton _kpS = new JButton("*");
+	protected JButton _kpP = new JButton("#");
 	
 	//Jmenu items for function
-	private JMenuItem _newRun = new JMenuItem("NEWRUN");
-	private JMenuItem _endRun = new JMenuItem("ENDRUN");
-	private JMenuItem _DNF = new JMenuItem("DNF");
-	private JMenuItem _cancel = new JMenuItem("CANCEL");
-	private JMenuItem _num = new JMenuItem("NUM");
-	private JMenuItem _reset = new JMenuItem("RESET");
-	private JMenuItem _print = new JMenuItem("PRINT");
-	private JMenuItem _export = new JMenuItem("EXPORT");
-	private JMenu _eventMenu = new JMenu("EVENT");				//need submenu for events
+	protected JMenuItem _newRun = new JMenuItem("NEWRUN");
+	protected JMenuItem _endRun = new JMenuItem("ENDRUN");
+	protected JMenuItem _DNF = new JMenuItem("DNF");
+	protected JMenuItem _cancel = new JMenuItem("CANCEL");
+	protected JMenuItem _num = new JMenuItem("NUM");
+	protected JMenuItem _reset = new JMenuItem("RESET");
+	protected JMenuItem _print = new JMenuItem("PRINT");
+	protected JMenuItem _export = new JMenuItem("EXPORT");
+	protected JMenu _eventMenu = new JMenu("EVENT");				//need submenu for events
 	
 	//submenu items for events
-	private JMenuItem _eventIND = new JMenuItem("IND");
-	private JMenuItem _eventPARIND = new JMenuItem("PARIND");
-	private JMenuItem _eventGRP = new JMenuItem("GRP");
-	private JMenuItem _eventPARGRP = new JMenuItem("PARGRP");
+	protected JMenuItem _eventIND = new JMenuItem("IND");
+	protected JMenuItem _eventPARIND = new JMenuItem("PARIND");
+	protected JMenuItem _eventGRP = new JMenuItem("GRP");
+	protected JMenuItem _eventPARGRP = new JMenuItem("PARGRP");
 	
 	//jradio buttons for attaching sensors
-	private JRadioButton _chOne = new JRadioButton();
-	private JRadioButton _chTwo = new JRadioButton();
-	private JRadioButton _chThree = new JRadioButton();
-	private JRadioButton _chFour = new JRadioButton();
-	private JRadioButton _chFive = new JRadioButton();
-	private JRadioButton _chSix = new JRadioButton();
-	private JRadioButton _chSeven = new JRadioButton();
-	private JRadioButton _chEight = new JRadioButton();
+	protected JRadioButton _chOne = new JRadioButton();
+	protected JRadioButton _chTwo = new JRadioButton();
+	protected JRadioButton _chThree = new JRadioButton();
+	protected JRadioButton _chFour = new JRadioButton();
+	protected JRadioButton _chFive = new JRadioButton();
+	protected JRadioButton _chSix = new JRadioButton();
+	protected JRadioButton _chSeven = new JRadioButton();
+	protected JRadioButton _chEight = new JRadioButton();
 	
 	//initialize JCombobox to handle different types of sensors
-	private String[] sensorTypes = {"NONE","EYE","GATE","PAD"};
-	private JComboBox _sensorBox = new JComboBox(sensorTypes);
+	protected String[] sensorTypes = {"NONE","EYE","GATE","PAD"};
+	protected JComboBox _sensorBox = new JComboBox(sensorTypes);
 	
 	
 	//power buttons | swap | function menu
-	private JButton _power = new JButton("POWER");
-	private JButton _printerPower = new JButton("PRINTER POWER");	
-	private JButton _swap = new JButton("SWAP");
-	private JMenuBar _functionBar = new JMenuBar();
-	private JMenu	_functionMenu	= new JMenu("FUNCTION");
-	private static JTextArea printerTextArea = new JTextArea(5, 20);
-	private static JTextArea raceTextArea = new JTextArea(10, 20);
-	private boolean power = false;
-	private Thread displayUpdater;
+	protected JButton _power = new JButton("POWER");
+	protected JButton _printerPower = new JButton("PRINTER POWER");	
+	protected JButton _swap = new JButton("SWAP");
+	protected JMenuBar _functionBar = new JMenuBar();
+	protected JMenu	_functionMenu	= new JMenu("FUNCTION");
+	protected static JTextArea printerTextArea = new JTextArea(5, 20);
+	protected static JTextArea raceTextArea = new JTextArea(10, 20);
+	protected boolean power = false;
+	protected Thread displayUpdater;
 	
 	//pass in printerfield and raceTextArea to chronotimer for printing events 
-	private static Chronotimer _c = new Chronotimer(printerTextArea);
+	protected static Chronotimer _c = new Chronotimer(printerTextArea);
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -604,11 +604,11 @@ public class ChronotimerGUI extends JFrame {
 			_chEight.setEnabled(false);
 		}
 	}
-	private void updateRunningDisplay(){
+	protected void updateRunningDisplay(){
 		raceTextArea.setText(_c.displayWaiting() + "\n\n" + _c.displayRacing() + "\n\n" +  _c.displayFinished());
 	}
 	
-	private void runThread() {
+	protected void runThread() {
 		displayUpdater = new Thread() {
 			public void run() {
 				while(power) {
@@ -626,6 +626,9 @@ public class ChronotimerGUI extends JFrame {
 	
 	protected JTextArea getPrinterTextArea() {
 		return printerTextArea;
+	}
+	public Chronotimer getCT(){
+		return _c;
 	}
 	
 	

@@ -1,10 +1,12 @@
 import org.junit.Test;
+
+
 import static org.junit.Assert.*;
 import javax.swing.JTextArea;
 
 public class Testing {
 	private Chronotimer ct = new Chronotimer(new JTextArea());
-	//private ChronotimerGUI ctGUI;
+	private ChronotimerGUI ctGUI;
 	
 	@Test
 	public void testRaceTypeIND() {
@@ -143,8 +145,6 @@ public class Testing {
 		ct.COMMANDS("TRIG 1");
 		assertEquals("123",ct.getFinished().getLast().getName());				//123 in lane 1 finished last and will be last in our finished list 
 		ct.COMMANDS("PRINT");
-		
-		
 		
 		
 		ct.COMMANDS("ENDRUN");
@@ -358,14 +358,24 @@ public class Testing {
 	
 	@Test
 	public void testNUM() {
+		System.out.println("       -- TEST NUM --       ");
+		ct.COMMANDS("POWER");
+		ct.COMMANDS("NUM 123");								//should not be able to add racers right now
+		ct.COMMANDS("NEWRUN");
+		ct.COMMANDS("NUM 234");	
+		ct.COMMANDS("NUM 999990");	
+		assertEquals(1,ct.getRun().getRacers().size());			//size should only be 1
+		assertEquals("234",ct.getRun().getRacers().get(0).getName());		//if size == 1 then only racer in there should be 234
+	
 		
 	}
 	
-	/*
-	 * Testing gui is essentially same thing as testing the chronotimer more or less 
-	 * otherwise we would have to change everything to protected or add getters for each button
-	 * 
-	 * 
+	@Test
+	public void testAddingMany(){
+		
+	}
+	
+	
 	
 	@Test
 	public void testGUI() {
@@ -374,14 +384,14 @@ public class Testing {
 		ctGUI._power.doClick();
 		ctGUI._power.doClick();
 		ctGUI._power.doClick();												// Turn power on, off, on
-		assertTrue(_c.getpower());						// Test power state
+		assertTrue(ctGUI.getCT().getPower());						// Test power state
 		ctGUI._printerPower.doClick();										// Turn on the printer
 		ctGUI._functionMenu.doClick(); ctGUI._eventMenu.doClick(); ctGUI._eventIND.doClick();			// Set event
 		ctGUI._functionMenu.doClick(); ctGUI._newRun.doClick();				// Start a run
 		ctGUI._swap.doClick();												// Test swapping outside of a race
-		assertEquals("IND", ctGUI._c._event);			// Test if event was set correctly
+		assertEquals("IND", ctGUI.getCT().getEvent());			// Test if event was set correctly
 		ctGUI._ch1.doClick(); ctGUI._ch2.doClick(); ctGUI._ch3.doClick(); ctGUI._ch4.doClick();	// Activate channels 1-4
-		assertTrue(ctGUI._c._channels[3]._state);		// Test if one of the selected channels is indeed active
+		assertTrue(ctGUI.getCT().getChannels()[3].getState());		// Test if one of the selected channels is indeed active
 		ctGUI._kp1.doClick(); ctGUI._kp2.doClick(); ctGUI._kp3.doClick();
 		ctGUI._functionMenu.doClick(); ctGUI._num.doClick();
 		ctGUI._kp4.doClick(); ctGUI._kp5.doClick(); ctGUI._kp6.doClick();
@@ -390,14 +400,15 @@ public class Testing {
 		ctGUI._b3.doClick();												// Start the race
 		ctGUI._swap.doClick();												// Test swapping during a race
 		ctGUI._functionMenu.doClick(); ctGUI._print.doClick();				// Print the current status of the race
-		assertFalse(ctGUI._c._racing.isEmpty());		// Test for activity in racing queue
+		assertFalse(ctGUI.getCT().getRacing().isEmpty());		// Test for activity in racing queue
 		ctGUI._b2.doClick();
 		ctGUI._b4.doClick();												// Finish the race
-		assertTrue(ctGUI._c._racing.isEmpty());			// Test for emptiness in racing queue
+		assertTrue(ctGUI.getCT().getRacing().isEmpty());			// Test for emptiness in racing queue
 		ctGUI._endRun.doClick();											// End the race
+		ctGUI._kp1.doClick();
 		ctGUI._functionMenu.doClick(); ctGUI._export.doClick();				// Export the results
 	}
 
-	*/
+	
 	
 }
