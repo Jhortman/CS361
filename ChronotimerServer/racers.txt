@@ -11,7 +11,7 @@
 333	Jon Schmidt
 444	Michael Dudley
 555	Jon Snowman
-666 Luke Stein
+666	Luke Stein
 777	Earl Grey
 888	Lucy Douglas
 999	Sarah Smith
