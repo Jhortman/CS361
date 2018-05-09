@@ -5,11 +5,12 @@ import static org.junit.Assert.*;
 import javax.swing.JTextArea;
 
 public class Testing {
-	private Chronotimer ct = new Chronotimer(new JTextArea());
+	private Chronotimer ct;
 	private ChronotimerGUI ctGUI;
 	
 	@Test
 	public void testCommands() {
+		ct= new Chronotimer(new JTextArea());
 		System.out.println("       -- TEST COMMANDS --       ");
 		ct.COMMANDS("POWER");
 		ct.COMMANDS("POWER");
@@ -36,6 +37,7 @@ public class Testing {
 	//test Tme
 	@Test
 	public void testTIME() {
+		ct= new Chronotimer(new JTextArea());
 		System.out.println("       -- TEST TIME --       ");
 		ct.COMMANDS("POWER");
 		ct.COMMANDS("TIME 12:01:01.0");
@@ -51,6 +53,7 @@ public class Testing {
 	// test adding 1000 racers to queue
 	@Test
 	public void testAddingMany(){
+		ct= new Chronotimer(new JTextArea());
 		System.out.println("       -- TEST ADDING 1000 RACERS --       ");
 		ct.COMMANDS("POWER");
 		ct.COMMANDS("NEWRUN");
@@ -76,7 +79,7 @@ public class Testing {
 		}
 		ct.COMMANDS("PRINT");
 		ct.COMMANDS("ENDRUN");
-		ct.COMMANDS("EXPORT 1");
+		ct.COMMANDS("EXPORT 2");
 		
 		
 	}
@@ -89,7 +92,7 @@ public class Testing {
 		ctGUI._power.doClick();
 		ctGUI._power.doClick();
 		ctGUI._power.doClick();												// Turn power on, off, on
-		assertTrue(ctGUI.getCT().getPower());						// Test power state
+		assertTrue(ctGUI.getCT().getPower());							// Test power state
 		ctGUI._printerPower.doClick();										// Turn on the printer
 		ctGUI._functionMenu.doClick(); ctGUI._eventMenu.doClick(); ctGUI._eventIND.doClick();			// Set event
 		ctGUI._functionMenu.doClick(); ctGUI._newRun.doClick();				// Start a run
