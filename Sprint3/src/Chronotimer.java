@@ -97,7 +97,7 @@ public class Chronotimer {
 			case "TRIG"		: TRIG(Integer.parseInt(tokens[1])- 1);break;
 			case "START"	: START(); break;
 			case "FINISH"	: FINISH();  break;
-			case "NUM" 		: if (_curRun != null)  _curRun.add(tokens[1],_printer);  break;
+			case "NUM" 		: if (_curRun != null)  _curRun.add(tokens[1],_printer); break;
 			case "NEWRUN"	: newRun();	  break;
 			case "ENDRUN"	: endRun();   break;
 			case "PRINT"	: Print() ;   break;
@@ -316,6 +316,18 @@ public class Chronotimer {
 		if(_curRun == null) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " no run currently active");
 			_printer.append("no run currently active\r\n");
+			return;
+		}
+		//executed when endrun has been called during a started group race and there are "ghost" numbers yet to be assigned proper bib numbers
+		else if(_curRun.getCurEvent().equals("GRP") & !_tempFinished.isEmpty()){
+			int fsize = _finished.size();					//keep track of size of those who have been entered in with their correct order
+			int tsize = _tempFinished.size();{				//keep track of those ghost numbers that have yet to been entered into the system
+				for(int j = fsize; j < fsize + tsize; j++) {	//start from the end of those finished queue and traverse whats left to be inputed in our temp Finish queue adding ghost numbers 002, 003, etc. for those not entered
+					_curRacer = _tempFinished.removeFirst();
+					_curRacer.setName("00" + (j + 1));
+					_finished.add(_curRacer);
+				}
+			}
 		}
 		else {
 			if(!_racing.isEmpty()) {		//any racers still racing while event ends receive a DNF
@@ -327,24 +339,20 @@ public class Chronotimer {
 				}
 			
 			}
-			
-			System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
-			_printer.append("Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
-			_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
-			
-			String out = new Gson().toJson(_storage.get(_storage.size()-1));
-			System.out.println(out);
-			sendPost(out);	//Convert last created _storage into JSON using gson to send a post message over to our server
-			_curRun = null;				//deactivate run
-			_finished.clear();			//clear all racers from finished queue;
-			_racing.clear();			//clear all racers from active queue;
-			_tempFinished.clear();		//clear all racers from temp queue;
-			_racingMap.clear();
-			_event = null;
-			
-			
-			
 		}
+		System.out.println(Time.toHMSString(Time.getTime()) + " Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)");
+		_printer.append("Event " + _curRun.getCurEvent() + " is ending (Saving run: Clearing ended run from immediate memory)" + "\r\n");
+		_storage.add(new Storage(_curRun, _finished));  	//save run results into storage class
+			
+		String out = new Gson().toJson(_storage.get(_storage.size()-1));
+		System.out.println(out);
+		sendPost(out);	//Convert last created _storage into JSON using gson to send a post message over to our server
+		_curRun = null;				//deactivate run
+		_finished.clear();			//clear all racers from finished queue;
+		_racing.clear();			//clear all racers from active queue;
+		_tempFinished.clear();		//clear all racers from temp queue;
+		_racingMap.clear();
+		_event = null;	
 	}
 	//prints current run of racer
 	private void Print() {
@@ -508,6 +516,7 @@ public class Chronotimer {
 				return;
 			}
 		}
+		
 		//no racers found in tempFinish or invalid bib number: print and do nothing
 		System.out.println(" Bibnum not associated with this race");
 		_printer.append("Bibnum not associated with this race\n");

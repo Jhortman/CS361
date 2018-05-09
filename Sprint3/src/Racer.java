@@ -17,7 +17,9 @@ public class Racer{
 	public String getName() {
 		return name;
 	}
-
+	public void setName(String rname){
+		name = rname;
+	}
 	
 	//might use later
 	public String getStart() {
