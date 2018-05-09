@@ -25,22 +25,4 @@ public class Storage {
 	public void setFinish(LinkedList<Racer> finish) { _finished = finish; 	}
 	
 	
-	/*
-	//method to perform something on export call
-	public String print() {
-		String ret = "";
-		if(_finished.size() == 0) {
-			ret += Time.toHMSString(Time.getTime()) + " No times to report";
-			return ret;
-		}
-		else{
-			ret += "for run " + _run.getRunNum() + ":\n";
-			for(int i = 0 ; i < _finished.size(); i++) {
-				ret += Time.toHMSString(Time.getTime()) + " Racer " + _finished.get(i).getName() + " runtime is " + _finished.get(i).getRaceTime() + "\n";
-			}
-			return ret;
-		}
-	}
-	*/ 
-	
 }

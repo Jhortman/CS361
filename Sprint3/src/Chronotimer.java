@@ -149,17 +149,30 @@ public class Chronotimer {
 		Time.setTime(s);		//set system time to the inputed time in string format
 	}
 	private void DNF() {		//current racer in race receives DNF
-		_curRacer = _racing.get(0);
-		_curRacer.DNF();
-		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!");
-		_printer.append("Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
-		_finished.add(_racing.remove(_racing.indexOf(_curRacer))); //remove racer out of active racers and put into finished racers
-	}
-	private void CANCEL() {
-		if(_curRun == null)	{
+		if(_curRun == null )	{
+			return;
+		}
+		if(_curRun.getCurEvent().equals("GRP") || _curRun.getCurEvent().equals("PARGRP")) {
+			System.out.println(Time.toHMSString(Time.getTime()) + " " + "DNF is disabled for GRP and PARGRP");
+			_printer.append("DNF is disabled for GRP and PARGRP \r\n");
 			return;
 		}
 		
+		_curRacer = _racing.removeFirst();
+		_curRacer.DNF();
+		System.out.println(Time.toHMSString(Time.getTime()) + " " + "Racer " + _curRacer.getName() + " DNF!!!");
+		_printer.append("Racer " + _curRacer.getName() + " DNF!!!" + "\r\n");
+		_finished.add(_curRacer); //remove racer out of active racers and put into finished racers
+	}
+	private void CANCEL() {
+		if(_curRun == null )	{
+			return;
+		}
+		if(_curRun.getCurEvent().equals("GRP") || _curRun.getCurEvent().equals("PARGRP")) {
+			System.out.println(Time.toHMSString(Time.getTime()) + " " + "Cancel is disabled for GRP and PARGRP");
+			_printer.append("Cancel is disabled for GRP and PARGRP \r\n");
+			return;
+		}
 		if(!_racing.isEmpty()) {
 			_curRacer = _racing.removeFirst();  	  //next to finish in race is removed and added back to next to start
 			_curRacer.resetTime();
@@ -172,6 +185,11 @@ public class Chronotimer {
 	
 	//if channel is active -> disarm and vice versa
 	private void TOG(int i) {
+		if(i > 8 ) {
+			System.out.println(Time.toHMSString(Time.getTime()) + " Channel does not exist");
+			_printer.append("Channel does not exist\r\n");
+			return;
+		}
 		_channels[i].toggleState();
 		if(_channels[i].getState()) {
 			System.out.println(Time.toHMSString(Time.getTime()) + " " + _channels[i].getNum() + " is active.");
@@ -205,20 +223,12 @@ public class Chronotimer {
 				_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
 			}
 			else if(_curRun.getCurEvent().toUpperCase().equals("PARIND") && _channels[i].getNum() == 3) {
-				if(_curRun.getRacers().size() > 1) {
-					_curRacer = _curRun.getRacers().remove(1); //remove racer who is 2nd to start  
-					_curRacer.start();
-					_racing.add(_curRacer); // add racer to racers: currently racing queue
-					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
-					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
-				}
-				else {
 					_curRacer = _curRun.popRacer(); //remove racer who is 2nd to start  
 					_curRacer.start();
 					_racing.add(_curRacer); // add racer to racers: currently racing queue
 					System.out.println(Time.toHMSString(Time.getTime()) + " Start time for " + _curRacer.getName() + " is " + _curRacer.getStart());
 					_printer.append("Start time for " + _curRacer.getName() + " is " + _curRacer.getStart() + "\r\n");
-				}
+				
 			}
 			else if (_curRun.getCurEvent().toUpperCase().equals("PARGRP") && _channels[i].getNum() == 1) {
 				if(!_racing.isEmpty()) {
@@ -251,20 +261,11 @@ public class Chronotimer {
 				_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
 			}
 			else if(_curRun.getCurEvent().toUpperCase().equals("PARIND") && _channels[i].getNum() == 4) {
-				if(_racing.size() > 1) {
-					_curRacer = _racing.remove(1); // remove 2nd to finish 
-					_curRacer.finish();
-					_finished.add(_curRacer);  // add racer to finished queue
-					System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
-					_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
-				}
-				else {
 					_curRacer = _racing.removeFirst(); // remove 2nd to finish 
 					_curRacer.finish();
 					_finished.add(_curRacer);  // add racer to finished queue
 					System.out.println(Time.toHMSString(Time.getTime()) + " Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() );
 					_printer.append("Finish time for " + _curRacer.getName() + " is " +  _curRacer.getFinish() + "\r\n" );
-				}
 			}
 				
 		}
@@ -286,7 +287,7 @@ public class Chronotimer {
 	//NEED to simplify compound conditionals here 
 	private void FINISH() {  // same as triggering finish on channel 2
 		
-		if(_curRun!= null && !_racing.isEmpty() && _channels[0].getState()) {
+		if(_curRun!= null && !_racing.isEmpty() && _channels[1].getState()) {
 			_curRacer = _racing.removeFirst(); // first in first to finish 
 			_curRacer.finish();
 			_finished.add(_curRacer);  // add racer to finished queue
@@ -518,13 +519,13 @@ public class Chronotimer {
 			return;
 		}
 		
-		
+		//check to see if channel triggered has key match in our hashmap of racers that we constructed earlier, if yes-- temporarily construct racer associated with key-value pair and remove associated key value
 		if(_racingMap.containsKey(i)) {
 			Racer temp = _racingMap.get(i);
 			_racingMap.remove(i);
 			
 			for(int j = 0; j < _racing.size();j++) {
-				if(_racing.get(j).getName().equals(temp.getName())) {
+				if(_racing.get(j).getName().equals(temp.getName())) {			//try to find racer in _racing queue, if yes---> remove the racer from it and add to end of finished queue
 					_curRacer = _racing.remove(j);
 					_curRacer.finish();
 					_finished.add(_curRacer);
@@ -586,6 +587,8 @@ public class Chronotimer {
 	//surrounded everything in try/catch since it will be throwing many errors upon trying to check for potential changes in updates to be made for the display
 	//class to build string for runningDisplay that will be used to constantly rewrite textField in the gui to keep an updated display of racers racing
 	//Using a thread in gui that calls this method every 100 milliseconds to rewrite runningDisplay textfield in gui
+	//when handling displaying runners that are racing want to reverse traverse _racing queue if size > 1 so that first to finish racer is on the bottom in the 
+	//_racing queue of racers on the runningDisplay
 	private class RunningDisplay
 	{
 		private String _waiting;
@@ -682,7 +685,7 @@ public class Chronotimer {
 			}
 			case "GRP":
 			{
-				_waiting = "";
+				_waiting = "";						//just display everyone waiting in queue to running display
 				if(!_curRun.getRacers().isEmpty()) {
 					_waiting += _curRun.getRacers().get(0).getName() + " \n";
 					for(int i = 1; i < _curRun.getRacers().size(); i++){
@@ -712,7 +715,7 @@ public class Chronotimer {
 			}
 			case "PARGRP":
 			{
-				_waiting = "";
+				_waiting = "";							//just display everyone waiting in queue to running display
 				if(!_curRun.getRacers().isEmpty()) {
 					_waiting += _curRun.getRacers().get(0).getName() + "\n";
 					for(int i = 1; i < _curRun.getRacers().size(); i++){
@@ -720,7 +723,7 @@ public class Chronotimer {
 					}
 				}
 				try{
-					racing = "";
+					racing = "";									
 					if(!_racing.isEmpty()) {
 						racing += _racing.get(_racing.size() -1 ).getName() + "  " + time.getRacingTime(System.currentTimeMillis() - _racing.get(_racing.size() -1).getStartAsLong()) + "\n";
 						if(_racing.size() > 1){

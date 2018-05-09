@@ -4,7 +4,6 @@ import javax.swing.JTextArea;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 
 public class Simulator extends Time{

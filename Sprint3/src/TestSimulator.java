@@ -3,10 +3,13 @@ import static org.junit.Assert.*;
 
 import javax.swing.JTextArea;
 
+//Testing files given to us on D2l
 
-//Class used to utilize simulator to read file and then quickly execute commands and 
-//generate output.
-//can also be used to construct files that input values that try to crash the system.
+
+
+
+//Class can used to utilize simulator to read files and execute commands to
+//quickly generate output or test values.
 
 
 public class TestSimulator {
@@ -28,21 +31,6 @@ public class TestSimulator {
 	@Test
 	public void testSprint2() {
 		s.readFile("sprint2.txt", new Chronotimer(new JTextArea()));
-		
-	}
-
-	//sprint3.txt doesnt test much as we are switching to gui at this point 
-	//same as sprint2.txt for the most part
-	//TODO write file to properly test sprint 3
-	@Test
-	public void testSprint3() {
-		s.readFile("sprint3.txt", new Chronotimer(new JTextArea()));
-		
-	}	
-	@Test
-	public void testSprint4() {
-		//s.readFile("CTS1RUN2.txt", new Chronotimer(cg.getPrinterTextArea()));
-		//TODO write file to test sprint4 using simulator
 		
 	}
 }
